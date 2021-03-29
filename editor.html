@@ -18,24 +18,23 @@
                 <form id="info-form">
                     <label>Name</label>
                     <select id="level-list" name="level-name">
-                        <option value="level-1">Level 1</option>
                         <!--Will add other options as we go-->
                     </select><br>
                     
                     Obstacles:
-                    <br><input type = "text" name="obstacles" value ="10"> <br>
+                    <br><input id="obstacles-text" type = "text" name="obstacles" value ="10"> <br>
                     Cannons:
-                    <br><input type="text" name="cannons" value="1"> <br>
+                    <br><input id="cannons-text" type="text" name="cannons" value="1"> <br>
                     Max Shots:
-                    <br><input type="text" name="shots" value="15"> <br>
+                    <br><input id="shots-text" type="text" name="shots" value="15"> <br>
                     Background:
-                    <br><input type="text" name="background" value="my-background"> <br>
+                    <br><input id="background-text" type="text" name="background" value="my-background"> <br>
                     One Star Score:
-                    <br><input type="text" name="score-star-1" value="1000"> <br>
+                    <br><input id="star-1-text" type="text" name="score-star-1" value="1000"> <br>
                     Two Star Score:
-                    <br><input type="text" name="score-star-2" value="10000"> <br>
+                    <br><input id="star-2-text" type="text" name="score-star-2" value="10000"> <br>
                     Three Star Score:
-                    <br><input type="text" name="score-star-2" value="50000"> <br>
+                    <br><input id="star-3-text" type="text" name="score-star-3" value="50000"> <br>
                 </form> <br>
 
                 <div id="save-button"><button>Save</button></div>
@@ -44,18 +43,18 @@
             <div id="editor-area" class="flex-center-item editor box-border">
                 <div id = "edit-window" class="box border">
                     <!-- This area is generated Programatically -->
+                    <div id="box-1" class="wood-box draggable" draggable = "true">
 
+                    </div>
                 </div>
             </div>
 
             <div id="object-lib-area" class = "box-border flex-item">
                 Objects:
                 <br>
-                <ul id="object-list" class="box-border" style="list-style: none;">
+                <ul id="object-list" class="box-border" style="list-style: none; padding-left:0;">
                     <!--Create list items in code-->
-                    <li name="obj1" value="obj1">
-                        <div class="obstacle debug" draggable="true"></div>
-                    </li>
+                    
                 </ul>
             </div>
 

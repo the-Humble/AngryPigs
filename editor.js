@@ -2,13 +2,13 @@
 'use strict'
 
 import Editor from './scripts/Editor.js';
-
 //Main
 
 (function Main() {
+    
     $(document).ready( event => {
 
         const app = new Editor();
         app.run();
     })
-})
+})()

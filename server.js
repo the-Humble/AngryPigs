@@ -1,16 +1,22 @@
-// Copyright (c) 2021 Jose Ignacio Ferrer Vera
+// Copyright (C) 2021 Jose Ignacio Ferrer Vera
 'use strict';
 
 import Express from 'express';
 import Path from 'path';
-import HTTP from 'http';
 const __dirname = Path.resolve();
+import HTTP from 'http';
+import FileSystem from 'fs-extra';
+
+import Reply from './scripts/Reply.js';
+import ReplyGet from './scripts/ReplyGet.js';
+import { Console } from 'console';
 
 const PORT = 3000;
 
 class Server {
 
     constructor() {
+        this.title = "Angry Pigs"
         this.api = Express();
         this.api.use( Express.json())
                 .use( Express.urlencoded( { extended: false }))
@@ -36,6 +42,51 @@ class Server {
             let data = request.body;
         });
 
+        this.api.post('/api/get_level_list', (request, response) =>{
+            let data = request.body;
+            let reply = new ReplyGet(1);
+            this._readThroughList(reply, request.body)
+                .then(newReply =>{
+                    response.send(reply.serialize());
+                }).catch(error => this._showErrorDialog(error));
+
+        });
+
+        this.api.post('/api/get_object_list', (request, response) =>{
+            //Send object list from data/library folder
+            let reply = new Reply(1, "No data found");
+            this._gameObjectList(reply)
+                .then(reply => {
+                    response.send(reply.ok().serialize());
+                })
+                .catch(error => {this._showErrorDialog(error)});
+
+        });
+
+        this.api.post('/api/save', (request, response) =>{
+            
+        });
+
+        this.api.post('/api/load', (request, response) =>{
+            
+            let params = request.body;
+            //Request params
+            //{
+            //"userid": "valid vfs username", // eg pg15student
+            //"name": "filename", // name of entity, no spaces, no extension
+            //"type": "object" | "level", // one of these two key strings
+            //}
+            let reply = new Reply( 1, "Don't use data" );
+
+            this._loadFileContent(reply, params)
+                .then(reply => {
+                    response.send(reply.ok().serialize());
+                })
+                .catch(error => []);
+            
+            
+        });
+
         this.run();
     }
 
@@ -53,6 +104,68 @@ class Server {
         })
 
         
+    }
+
+    _gameObjectList(reply)
+    {
+        return new Promise( (resolve, reject) =>{
+            FileSystem.readdir('./data/library')
+                .then(objectFiles =>{
+                    resolve(reply.payload = objectFiles);
+                })
+                .catch(err =>{
+                    reject(reply.error(1, "No data found"));
+                })
+        })
+    }
+
+    _readThroughList(reply, params){
+        return new Promise((resolve, reject) => {
+            let folder = "./data";
+            if(params.type == "object"){
+                folder += "/library"
+            }
+            FileSystem.readdir( `${folder}`, {withFileTypes: true})
+                .then(fileNamelist =>{    
+                    fileNamelist.forEach(element => {
+                        if(element.name.includes('.json')){
+                            let newObj = {
+                                name: `${element.name}`.replace(".json", ""),
+                                filename: `${element.name}`
+                            }
+                            reply.addToPayload(newObj);
+                        }
+                    })
+                    resolve(reply);
+                })
+                .catch(error => {reject(error)});
+            })
+    }
+
+    _loadFileContent(reply, params)
+    {
+        return new Promise( (resolve, reject) =>{
+            //open some file, name is in parameters
+            let folder = "./data";
+            if(params.type == "object"){
+                folder += "/library"
+            }
+            
+            FileSystem.readFile( `${folder}/${params.name}`, 'utf8')
+                .then(fileData => {
+                    //if data is okay, add to reply
+                    reply.payload = fileData;
+                    resolve(reply);
+                })
+                .catch(err =>{
+                    reject(reply.error(1, "No data found"));
+                });
+        })
+    }
+
+    _showErrorDialog(error){
+        //TODO: build a dialog system for shooting error messages
+        console.log(error)
     }
 }
 
