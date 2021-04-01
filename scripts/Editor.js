@@ -21,27 +21,29 @@ export default class Editor {
         this._populateLevelList();
 
         //fetch list of gameObjects
-        //Ideally creates a game object and tells it to populate itself
-        /*
-            this.gameObjectList = new GameObjectList();
-            this.gameObjectList.populate();
-        */
         this._populateGameObjectList()
             .then( gameObjects => {
                 //build sidebar with gameObjects
-                gameObjects.forEach(object =>{
-                    let $newEl = $(`<li name="${object}" value="${object.name}"> <div class="obstacle debug" draggable="true"></div>`);
-                    $('#object-list').append($newEl);
-                });
+                this._generateObject(gameObjects);
 
             })
             .catch(error => {this._showErrorDialog(error)});
         
         
+        
         //Initialize the draggables
         this._handleDraggable();
+
         //Handle user save events
+        //Load level characteristics on sidebar
         this._loadOnLevelChange();
+
+        //Save level
+
+
+        //Load Level on editor
+
+        
     }
 
 
@@ -64,17 +66,13 @@ export default class Editor {
             .then(levelData =>JSON.parse(levelData))
             .then( levelData => {
                 //populate the pulldown in the form
-
-                //tempList.level_1 === tempList['level_1']; //true
                 this._updateLevelList(levelData);
             });
     }
 
     _updateLevelList(levelList){
-        //TODO: do some jQuery to fill in the level list
         const $optionId = $('#level-list');
 
-        //TODO: <option value = "level_1">Level 1</option>
         levelList.payload.forEach(element => {
 
             let $newOption = $(`<option value = "${element.filename}">${element.name}</option>`);
@@ -86,7 +84,10 @@ export default class Editor {
 
         return new Promise( (resolve, reject) =>{
             //do some work async
-             $.post('/api/get_object_list',{type:'object'})
+             $.post('/api/get_object_list',{
+                userId: "pg20jose",
+                type: "object"
+                    })
                 .then(objectList => JSON.parse(objectList))
                 .then(objectList=> {
                     //if succesful resolve(data)
@@ -97,6 +98,49 @@ export default class Editor {
                     reject(error)
                 })
         });
+    }
+
+    _generateObject(gameObjects){
+        gameObjects.payload.forEach(object =>{
+            this._loadObject(object)
+            .then(objectDetails => JSON.parse(objectDetails.payload)) 
+            .then(objectDetails=> {
+                let $newEl = $(`<li name="${object.name}" value="${object.filename}"> 
+                                <div 
+                                    class="obstacle debug draggable" 
+                                    style = "width: ${objectDetails.width}px;
+                                            height: ${objectDetails.height}px;
+                                            background: url(${objectDetails.texture});
+                                            margin-top = .5rem;
+                                            margin-bottom: .5rem;
+                                            background-repeat: no-repeat;
+                                            background-size: 100% 100%"
+                                    draggable="true">
+                                </div>
+                                </li>`);
+                $('#object-list').append($newEl);
+            })
+            
+        });
+    }
+
+    _loadObject(object){
+        return new Promise((resolve, reject) => {
+            $.post('/api/load', {
+                userId: "pg20jose",
+                name: `${object.filename}`,
+                type: "object" 
+            })
+            .then(objectDetails => JSON.parse(objectDetails))
+                .then(objectDetails=> {
+                    //if succesful resolve(data)
+                    resolve(objectDetails);
+                })
+                .catch(error => {
+                    //if unsuccesful = reject(error)
+                    reject(error)
+                })
+        })
     }
 
     _loadOnLevelChange(){
@@ -111,32 +155,54 @@ export default class Editor {
                 .then(levelDetails => JSON.parse(levelDetails.payload))
                 .then(levelDetails => {
                     //TODO: Handle level details
-                    $('#obstacles-text').val(`${levelDetails.level.entityLists.collidableList.length}`);
+                    this._loadSidebar(levelDetails);
+                    this._loadLevel(levelDetails);
+                    
                 })
                 .catch(error => this._showErrorDialog(error));
             });
             
     }
 
+    _loadSidebar(levelDetails){
+        $('#obstacles-text').val(`${levelDetails.level.entityLists.collidableList.length}`);
+        $('#cannons-text').val(`${levelDetails.level.catapult.length}`);
+        $('#shots-text').val(`${levelDetails.level.ammo}`);
+    }
+
+    _loadLevel(levelDetails){
+        //TODO: Load level itself
+        $('#edit-window').empty();
+        let idCounter = 0;
+        levelDetails.level.entityLists.collidableList.forEach(object => {
+            let $newEl = $(`<div 
+                            id = "obstacle-${idCounter}"
+                            class="obstacle debug draggable" 
+                            style = "position: absolute;
+                                    top: ${object.pos.y}px;
+                                    left: ${object.pos.x}px;
+                                    width: ${object.entity.width}px;
+                                    height: ${object.entity.height}px;
+                                    background: url(${object.entity.texture});
+                                    background-repeat: no-repeat;
+                                    background-size: 100% 100%"
+                            draggable="true">
+                            </div>`)
+
+            $('#edit-window').append($newEl);
+            idCounter++;
+        })
+    }
+
     _handleDraggable(){
         $('.draggable')
-            .on('mouseover', event=>{
-                this._onDraggableMouseOver(event);
-            })
             .on('dragstart', event => {
                 this._onDraggableDragStart(event);
 
             })
-            .on('mouseout', event=>{
-                this._onDraggableMouseOut(event);
-            });
             
         $('#edit-window')
-            .on('click', event => {
-                console.log("I'm clicking");
-            })
             .on('mousemove', event =>{
-                console.log("I'm in");
                 event.preventDefault();
                 this._onEditWindowMouseMove(event);
             })
@@ -157,10 +223,6 @@ export default class Editor {
             left: left,
             top: top
         };
-    }
-
-    _onDraggableMouseOver(event){
-        //TODO:change cursor
     }
 
     _onDraggableDragStart(event){

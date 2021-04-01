@@ -13,10 +13,10 @@
                 "pos": {"x": 471, "y": 225 },
                 "entity": {
                     "type": 0,
-                    "name":"Metal Crate",
+                    "name": "Wooden Crate",
                     "height": 70,
                     "width": 70,
-                    "texture": "images/metalBox.png",
+                    "texture": "../images/woodenCrate.png",
                     "shape": "square",
                     "friction": 1,
                     "mass": 90,
@@ -27,13 +27,13 @@
                 "pos": {"x": 289, "y": 448 },
                 "entity": {
                     "type": 0,
-                    "name":"Stone Block",
-                    "height": 200,
-                    "width": 30,
-                    "texture": "images/stoneBox.png",
+                    "name": "Stone Box",
+                    "height": 60,
+                    "width": 40,
+                    "texture": "../images/stoneBox.png",
                     "shape": "square",
                     "friction": 1,
-                    "mass": 50,
+                    "mass": 100,
                     "restitution": 0
                 }
             }],

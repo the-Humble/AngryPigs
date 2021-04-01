@@ -45,18 +45,19 @@ class Server {
         this.api.post('/api/get_level_list', (request, response) =>{
             let data = request.body;
             let reply = new ReplyGet(1);
-            this._readThroughList(reply, request.body)
+            this._readThroughLevelList(reply, request.body)
                 .then(newReply =>{
                     response.send(reply.serialize());
-                }).catch(error => this._showErrorDialog(error));
+                })
+                .catch(error => this._showErrorDialog(error));
 
         });
 
         this.api.post('/api/get_object_list', (request, response) =>{
             //Send object list from data/library folder
-            let reply = new Reply(1, "No data found");
+            let reply = new ReplyGet(1);
             this._gameObjectList(reply)
-                .then(reply => {
+                .then(newReply => {
                     response.send(reply.ok().serialize());
                 })
                 .catch(error => {this._showErrorDialog(error)});
@@ -79,7 +80,7 @@ class Server {
             let reply = new Reply( 1, "Don't use data" );
 
             this._loadFileContent(reply, params)
-                .then(reply => {
+                .then(newReply => {
                     response.send(reply.ok().serialize());
                 })
                 .catch(error => []);
@@ -106,26 +107,9 @@ class Server {
         
     }
 
-    _gameObjectList(reply)
-    {
-        return new Promise( (resolve, reject) =>{
-            FileSystem.readdir('./data/library')
-                .then(objectFiles =>{
-                    resolve(reply.payload = objectFiles);
-                })
-                .catch(err =>{
-                    reject(reply.error(1, "No data found"));
-                })
-        })
-    }
-
-    _readThroughList(reply, params){
+    _readThroughLevelList(reply){
         return new Promise((resolve, reject) => {
-            let folder = "./data";
-            if(params.type == "object"){
-                folder += "/library"
-            }
-            FileSystem.readdir( `${folder}`, {withFileTypes: true})
+            FileSystem.readdir( `./data`, {withFileTypes: true})
                 .then(fileNamelist =>{    
                     fileNamelist.forEach(element => {
                         if(element.name.includes('.json')){
@@ -135,6 +119,24 @@ class Server {
                             }
                             reply.addToPayload(newObj);
                         }
+                    })
+                    resolve(reply);
+                })
+                .catch(error => {reject(error)});
+            })
+    }
+
+    _gameObjectList(reply){
+        return new Promise((resolve, reject) => {
+            FileSystem.readdir( `./data/library`, {withFileTypes: true})
+                .then(fileNamelist =>{    
+                    fileNamelist.forEach(element => {
+                        let newObj = {
+                            name: `${element.name}`.replace(".json", ""),
+                            filename: `${element.name}`
+                        }
+                        reply.addToPayload(newObj);
+                        
                     })
                     resolve(reply);
                 })
@@ -154,8 +156,7 @@ class Server {
             FileSystem.readFile( `${folder}/${params.name}`, 'utf8')
                 .then(fileData => {
                     //if data is okay, add to reply
-                    reply.payload = fileData;
-                    resolve(reply);
+                    resolve(reply.payload = fileData);
                 })
                 .catch(err =>{
                     reject(reply.error(1, "No data found"));
