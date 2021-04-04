@@ -9,7 +9,6 @@ import FileSystem from 'fs-extra';
 
 import Reply from './scripts/Reply.js';
 import ReplyGet from './scripts/ReplyGet.js';
-import { Console } from 'console';
 
 const PORT = 3000;
 
@@ -17,6 +16,8 @@ class Server {
 
     constructor() {
         this.title = "Angry Pigs"
+        this.levelIDs = 0;
+        this.objectIDs = 0;
         this.api = Express();
         this.api.use( Express.json())
                 .use( Express.urlencoded( { extended: false }))
@@ -65,7 +66,13 @@ class Server {
         });
 
         this.api.post('/api/save', (request, response) =>{
-            
+            this._parseLevel(request.body)
+            .then(levelJson=>{
+                //FIXME READ JSON
+                console.log(levelJson);
+            }).catch(error =>{
+                console.log('hi');
+            });
         });
 
         this.api.post('/api/load', (request, response) =>{
@@ -117,6 +124,7 @@ class Server {
                                 name: `${element.name}`.replace(".json", ""),
                                 filename: `${element.name}`
                             }
+                            this.levelIDs++;
                             reply.addToPayload(newObj);
                         }
                     })
@@ -126,17 +134,27 @@ class Server {
             })
     }
 
+    _parseLevel(params){
+        return new Promise ((resolve, reject)=>{
+            resolve(JSON.parse(params));
+            let err = {};
+            reject(err);
+        })
+    }
+
     _gameObjectList(reply){
         return new Promise((resolve, reject) => {
             FileSystem.readdir( `./data/library`, {withFileTypes: true})
                 .then(fileNamelist =>{    
                     fileNamelist.forEach(element => {
-                        let newObj = {
-                            name: `${element.name}`.replace(".json", ""),
-                            filename: `${element.name}`
-                        }
-                        reply.addToPayload(newObj);
-                        
+                        if(element.name.includes('object')){
+                            let newObj = {
+                                name: `${element.name}`.replace(".json", ""),
+                                filename: `${element.name}`
+                            }
+                            this.objectIDs++;
+                            reply.addToPayload(newObj);
+                        }   
                     })
                     resolve(reply);
                 })

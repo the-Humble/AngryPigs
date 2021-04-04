@@ -22,7 +22,7 @@
                     "mass": 90,
                     "restitution": 0
                 }
-            }, {
+                }, {
                 "id": 1,
                 "pos": {"x": 100, "y": 100 },
                 "entity": {
@@ -36,7 +36,7 @@
                     "mass": 100,
                     "restitution": 0
                 }
-            }, {
+                }, {
                 "id": 2,
                 "pos": {"x": 300, "y": 300 },
                 "entity": {

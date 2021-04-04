@@ -16,28 +16,43 @@
         <section id="editor-wrapper" class = "flex-container" style="border: 5px solid;">
             <div id="level-info-area" class="flex-item box-border info-form-area">
                 <form id="info-form">
-                    <label>Name</label>
+                    <label>Level:</label>
                     <select id="level-list" name="level-name">
                         <!--Will add other options as we go-->
                     </select><br>
-                    
-                    Obstacles:
-                    <br><input id="obstacles-text" type = "text" name="obstacles" value ="10"> <br>
-                    Cannons:
-                    <br><input id="cannons-text" type="text" name="cannons" value="1"> <br>
+                    Name:
+                    <br><input id="name-text" type = "text" name="obstacles" value ="10"> <br>
                     Max Shots:
-                    <br><input id="shots-text" type="text" name="shots" value="15"> <br>
-                    Background:
-                    <br><input id="background-text" type="text" name="background" value="my-background"> <br>
-                    One Star Score:
-                    <br><input id="star-1-text" type="text" name="score-star-1" value="1000"> <br>
-                    Two Star Score:
-                    <br><input id="star-2-text" type="text" name="score-star-2" value="10000"> <br>
-                    Three Star Score:
-                    <br><input id="star-3-text" type="text" name="score-star-3" value="50000"> <br>
+                    <br><input id="shots-text" type="number" name="shots" value="15"> <br>
+                    Filename
+                    <br><input id="filename-text" type="text" name="filename" value=""> <br>
                 </form> <br>
 
                 <div id="save-button"><button>Save</button></div>
+
+                <form id="object-form">
+                    <br><label>Object Editor</label><br>
+                    Height:
+                    <br><input id="object-type-text" type="text" name="type" value="0"> <br>
+                    Name:
+                    <br><input id="object-name-text" type = "text" name="object-name" value ="Crate"> <br>
+                    Height:
+                    <br><input id="object-height-text" type="text" name="height" value="100"> <br>
+                    Width:
+                    <br><input id="object-width-text" type="text" name="width" value="100"> <br>
+                    Texture:
+                    <br><input id="object-texture-text" type="text" name="texture" value="../images/woodenCrate.png"> <br>
+                    Shape:
+                    <br><input id="object-shape-text" type="text" name="shape" value="square"> <br>
+                    Friction:
+                    <br><input id="object-friction-text" type="text" name="friction" value="1"> <br>
+                    Mass:
+                    <br><input id="object-mass-text" type="text" name="mass" value="90"> <br>
+                    Restitution:
+                    <br><input id="object-restitution-text" type="text" name="restitution" value="0"> <br>
+                </form> <br>
+
+                <div id="create-object-button"><button>Create Object</button></div>
             </div>
 
             <div id="editor-area" class="flex-center-item editor box-border">

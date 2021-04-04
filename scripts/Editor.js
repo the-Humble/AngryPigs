@@ -1,5 +1,7 @@
 //Copyright (C) 2021 Jose Ignacio Ferrer Vera
 'use strict';
+import Request from './Request.js';
+import Level from './Level.js';
 
 export default class Editor {
     
@@ -13,6 +15,9 @@ export default class Editor {
         };
 
         this.$dragTarget;
+
+        this.objectID = 0;
+        this.targetID = 0;
 
         //Set the level itself on the DOM
         this.gameObjectList=[];
@@ -32,18 +37,18 @@ export default class Editor {
         
         
         //Initialize the draggables
-        this._handleDraggable();
+        this._handleDraggableEdit();
+
+        //Loads first level on startup
+        this._loadLevelOnStartup();
 
         //Handle user save events
         //Load level characteristics on sidebar
         this._loadOnLevelChange();
 
         //Save level
+        this._handleSaveEvents();
 
-
-        //Load Level on editor
-
-        
     }
 
 
@@ -58,7 +63,6 @@ export default class Editor {
 
     _populateLevelList(){
         //post a message to the server
-        //TODO: get the user's username
         $.post('/api/get_level_list', {
             userId: "pg20jose",
             type: "level"
@@ -105,22 +109,25 @@ export default class Editor {
             this._loadObject(object)
             .then(objectDetails => JSON.parse(objectDetails.payload)) 
             .then(objectDetails=> {
-                let $newEl = $(`<li name="${object.name}" value="${object.filename}"> 
-                                <div 
-                                    class="obstacle debug draggable" 
-                                    style = "width: ${objectDetails.width}px;
-                                            height: ${objectDetails.height}px;
-                                            background: url(${objectDetails.texture});
-                                            margin-top = .5rem;
-                                            margin-bottom: .5rem;
-                                            background-repeat: no-repeat;
-                                            background-size: 100% 100%"
-                                    draggable="true">
-                                </div>
-                                </li>`);
-                $('#object-list').append($newEl);
+                let $list = $(`<li name="${object.name}" value="${object.filename}"> </li>`);
+                let $el = $(`<div
+                                id = "${object.name}" 
+                                class="obstacle debug draggable" 
+                                style = "width: ${objectDetails.width}px;
+                                        height: ${objectDetails.height}px;
+                                        background: url(${objectDetails.texture});
+                                        margin-top = .5rem;
+                                        margin-bottom: .5rem;
+                                        background-repeat: no-repeat;
+                                        background-size: 100% 100%"
+                                draggable="true">
+                            </div>`);
+                
+                let $newEl = this._addObjectData($el, objectDetails);
+                $list.append($newEl);
+                $('#object-list').append($list);
+                this._handleDraggableObject();
             })
-            
         });
     }
 
@@ -143,6 +150,35 @@ export default class Editor {
         })
     }
 
+    _addObjectData($el, objectDetails){
+        $el.attr("type", objectDetails.type);
+        $el.attr("name", objectDetails.name);
+        $el.attr("height", objectDetails.height);
+        $el.attr("width", objectDetails.width);
+        $el.attr("texture", `${objectDetails.texture}`);
+        $el.attr("shape", `${objectDetails.shape}`);
+        $el.attr("friction", `${objectDetails.friction}`);
+        $el.attr("mass", `${objectDetails.mass}`);
+        $el.attr("restitution", `${objectDetails.restitution}`);
+        return $el;
+    }
+
+    _loadLevelOnStartup(){
+        $.post('/api/load', {
+            userId: "pg20jose",
+            name: `level_1.json`,
+            type: "level" 
+        })
+        .then(levelDetails => JSON.parse(levelDetails))
+        .then(levelDetails => JSON.parse(levelDetails.payload))
+        .then(levelDetails => {
+            this._loadSidebar(levelDetails);
+            this._loadLevel(levelDetails);
+            
+        })
+        .catch(error => this._showErrorDialog(error));
+    }
+
     _loadOnLevelChange(){
         $('#level-list')
             .on('change', event =>{
@@ -154,7 +190,6 @@ export default class Editor {
                 .then(levelDetails => JSON.parse(levelDetails))
                 .then(levelDetails => JSON.parse(levelDetails.payload))
                 .then(levelDetails => {
-                    //TODO: Handle level details
                     this._loadSidebar(levelDetails);
                     this._loadLevel(levelDetails);
                     
@@ -165,18 +200,58 @@ export default class Editor {
     }
 
     _loadSidebar(levelDetails){
-        $('#obstacles-text').val(`${levelDetails.level.entityLists.collidableList.length}`);
-        $('#cannons-text').val(`${levelDetails.level.catapult.length}`);
+        $('#name-text').val(`${levelDetails.level.name}`);
         $('#shots-text').val(`${levelDetails.level.ammo}`);
+        let filename = `${levelDetails.level.name}`.toLowerCase().replace("-", "_").concat(".json");
+        $('#filename-text').val(filename);
     }
 
     _loadLevel(levelDetails){
         //TODO: Load level itself
+        
         $('#edit-window').empty();
-        let idCounter = 0;
         levelDetails.level.entityLists.collidableList.forEach(object => {
             let $newEl = $(`<div 
-                            id = "obstacle-${idCounter}"
+                            id = "obstacle-${this.objectID}"
+                            class="obstacle debug draggable" 
+                            style = "position: absolute;
+                                    top: ${object.pos.y}px;
+                                    left: ${object.pos.x}px;
+                                    width: ${object.entity.width}px;
+                                    height: ${object.entity.height}px;
+                                    background: url(${object.entity.texture});
+                                    background-repeat: no-repeat;
+                                    background-size: 100% 100%"
+                            draggable="true">
+                            </div>`);
+            $newEl = this._addObjectData($newEl, object.entity);
+
+            $('#edit-window').append($newEl);
+            this._handleDraggableObject();
+            this.objectID++;
+        })
+
+        //TODO: Add cannons and create cannon object
+        let cannon = levelDetails.level.catapult;
+        let $cannon = $(`<div
+                            id= "cannon"
+                            class="obstacle debug draggable"
+                            style = "position: absolute;
+                            top: ${cannon.pos.y}px;
+                            left: ${cannon.pos.x}px;
+                            width: 200px;
+                            height: 200px;
+                            background: url(./images/catapult.png);
+                            background-repeat: no-repeat;
+                            background-size: 100% 100%";
+                            draggable="true">
+                        </div>`);
+        $('#edit-window').append($cannon);
+        //TODO: Add Enemies and create enemy object
+        
+        levelDetails.level.entityLists.targetList.forEach(object => {
+            let $newEn = $(`<div 
+                            id = "enemy-${this.targetID}"
                             class="obstacle debug draggable" 
                             style = "position: absolute;
                                     top: ${object.pos.y}px;
@@ -188,19 +263,22 @@ export default class Editor {
                                     background-size: 100% 100%"
                             draggable="true">
                             </div>`)
-
-            $('#edit-window').append($newEl);
-            idCounter++;
+            $newEn = this._addObjectData($newEn, object.entity);
+            $('#edit-window').append($newEn);
+            this.targetID++;
         })
     }
 
-    _handleDraggable(){
+    _handleDraggableObject(){
         $('.draggable')
             .on('dragstart', event => {
                 this._onDraggableDragStart(event);
 
             })
-            
+    }
+
+    _handleDraggableEdit(){
+             
         $('#edit-window')
             .on('mousemove', event =>{
                 event.preventDefault();
@@ -226,9 +304,20 @@ export default class Editor {
     }
 
     _onDraggableDragStart(event){
+        let $event = $(`#${event.target.id}`);
         let transferData = {
             targetId : event.target.id,
-            gameParams: {}
+            gameParams: {
+                type: `${$event.attr('type')}`,
+                name: `${$event.attr('name')}`,
+                height: `${$event.attr('height')}`,
+                width: `${$event.attr('width')}`,
+                texture: `${$event.attr('texture')}`,
+                shape: `${$event.attr('shape')}`,
+                friction: `${$event.attr('friction')}`,
+                mass: `${$event.attr('mass')}`,
+                restitution: `${$event.attr('restitution')}`
+            }
         };
 
         //Attach transfer data
@@ -238,15 +327,11 @@ export default class Editor {
         //grab offset
         this.$dragTarget = $(event.target);
         
-        this.offset.x = event.clientX = Math.floor( event.target.offsetLeft);
-        this.offset.y = event.clientY = Math.floor( event.target.offsetTop);
+        this.offset.x = event.clientX - Math.floor( event.target.offsetLeft);
+        this.offset.y = event.clientY - Math.floor( event.target.offsetTop);
         
         //old z index
         this.z = this.$dragTarget.css("zIndex");
-    }
-
-    _onDraggableMouseOut(event){
-        //TODO: change cursor back
     }
 
     _onEditWindowMouseMove(event){
@@ -260,16 +345,12 @@ export default class Editor {
     {
         this.$dragTarget = $(event.target);
 
-        this.offset.x = event.clientX = Math.floor( event.target.offsetLeft);
-        this.offset.y = event.clientY = Math.floor( event.target.offsetTop);
+        this.offset.x = event.clientX - Math.floor( event.target.offsetLeft);
+        this.offset.y = event.clientY - Math.floor( event.target.offsetTop);
 
         //update the css for the drag target
         let left = `${event.clientX-this.offset.x}px`;
         let top = `${event.clientY-this.offset.y}px`;
-
-        let $el = $(`<div id="box-${this.existingObjectId++}" ></div>`);
-        this.$dragTarget.append($el);
-        $el.css(this._cssFrom(left, top));
     }
 
     _onEditWindowDrop(event){
@@ -285,9 +366,61 @@ export default class Editor {
 
         //TODO: create new element in right location
         //FIXME: Procedurally generate ids
-        //let $el = $(`<div id="box-${id}" class="${} draggable" draggable = "true"></div>`);
+        let $el = $(`<div 
+                        id="box-${this.objectID++}" 
+                        class="draggable" 
+                        draggable = "true">
+                    </div>`);
         //$('#edit-window').append($el);
-
+        this.$dragTarget.append($el);
         $el.css(this._cssFrom(this.$dragTarget.css('left'), this.$dragTarget.css('top')));
+    }
+
+    _handleSaveEvents(){
+        $('#save-button').on('click', event=>{
+            let level = new Request($('#filename-text').val(), "level");
+            let levelPayload = new Level($('#name-text').val(), parseInt($('#shots-text').val()));
+            let levelDetails =  levelPayload.__private__.level;
+            //https://stackoverflow.com/questions/3024391/how-do-i-iterate-through-children-elements-of-a-div-using-jquery
+            
+            //save general info
+            //Save cannon
+            $('#edit-window').children().each(function (){
+                
+                if(`${$(this).attr('id')}`.includes("cannon"))
+                {
+                    levelDetails.catapult.pos.x = this.offsetLeft;
+                    levelDetails.catapult.pos.y = this.offsetTop;
+                }
+                
+                if(`${$(this).attr('id')}`.includes("obstacle"))
+                {
+                    levelPayload._appendObjectToList($(this), this.offsetLeft, this.offsetTop);
+                }
+
+                if(`${$(this).attr('id')}`.includes("enemy"))
+                {
+                    levelPayload._appendEnemyToList($(this), this.offsetLeft, this.offsetTop);
+                }
+                
+            })
+
+            level.payload = levelPayload;
+
+            //save objects
+
+            //save tragets
+
+            $.post('/api/save', level.serialize())
+            .then();
+        });
+
+        $('create-object-button').on('click', event=>{
+
+            let object = new Request($('#object-name-text').text(), "object")
+            
+            $.post('/api/save', level.serialize())
+            .then();
+        })
     }
 }
