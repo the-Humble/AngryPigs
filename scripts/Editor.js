@@ -76,6 +76,7 @@ export default class Editor {
 
     _updateLevelList(levelList){
         const $optionId = $('#level-list');
+        $optionId.empty();
 
         levelList.payload.forEach(element => {
 
@@ -105,6 +106,7 @@ export default class Editor {
     }
 
     _generateObject(gameObjects){
+        $('#object-list').empty();
         gameObjects.payload.forEach(object =>{
             this._loadObject(object)
             .then(objectDetails => JSON.parse(objectDetails.payload)) 
@@ -128,6 +130,7 @@ export default class Editor {
                 $('#object-list').append($list);
                 this._handleDraggableObject();
             })
+            .catch(err => this._showErrorDialog(err));
         });
     }
 
@@ -380,7 +383,7 @@ export default class Editor {
         $('#save-button').on('click', event=>{
             let level = new Request($('#filename-text').val(), "level");
             let levelPayload = new Level($('#name-text').val(), parseInt($('#shots-text').val()));
-            let levelDetails =  levelPayload.__private__.level;
+            let levelDetails =  levelPayload.info.level;
             //https://stackoverflow.com/questions/3024391/how-do-i-iterate-through-children-elements-of-a-div-using-jquery
             
             //save general info
@@ -405,22 +408,44 @@ export default class Editor {
                 
             })
 
-            level.payload = levelPayload;
+            level.payload = levelPayload.serialize();
 
-            //save objects
-
-            //save tragets
-
-            $.post('/api/save', level.serialize())
-            .then();
+            $.post('/api/save', level.request)
+            .then(answer => JSON.parse(answer))
+            .then(answer=>{
+                this._populateLevelList();
+            });
         });
 
-        $('create-object-button').on('click', event=>{
-
-            let object = new Request($('#object-name-text').text(), "object")
+        $('#create-object-button').on('click', event=>{
+            let name = `${$('#object-name-text').val().toLowerCase().replace(" ", "_")}.json`
+            let object = new Request(name, "object")
             
-            $.post('/api/save', level.serialize())
-            .then();
+            let objectDetails = {
+                type: `${$('#object-type-text').val()}`,
+                name: `${$('#object-name-text').val()}`,
+                height: `${$('#object-height-text').val()}`,
+                width: `${$('#object-width-text').val()}`,
+                texture: `${$('#object-texture-text').val()}`,
+                shape: `${$('#object-shape-text').val()}`,
+                friction: `${$('#object-friction-text').val()}`,
+                mass: `${$('#object-mass-text').val()}`,
+                restitution: `${$('#object-restitution-text').val()}`
+            }
+
+            object.payload = JSON.stringify(objectDetails);
+
+            $.post('/api/save', object.request)
+            .then(answer => JSON.parse(answer))
+            .then(answer=>{
+                this._populateGameObjectList()
+                .then( gameObjects => {
+                    //build sidebar with gameObjects
+                    this._generateObject(gameObjects);
+
+                })
+                .catch(error => {this._showErrorDialog(error)});
+            });
         })
     }
 }

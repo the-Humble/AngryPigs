@@ -39,7 +39,7 @@
 }
 
 .obstacle{
-   border: 2px solid green;
+   
 }
 
 .draggable{
@@ -51,6 +51,6 @@
 }
 
 .debug{
-
+    border: 2px solid green;
 }
 

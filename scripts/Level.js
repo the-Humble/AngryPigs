@@ -5,7 +5,7 @@ export default class Level {
     constructor(name, ammo){
 
         this.id = 0;
-        this.__private__ ={
+        this.info ={
             level:{
                 id: this.id++,
                 name,
@@ -53,10 +53,10 @@ export default class Level {
                 restitution: $objectDetails.attr('restitution')
             }
         }
-        this.__private__.level.entityLists.collidableList.push(object);
+        this.info.level.entityLists.collidableList.push(object);
     }
 
-    _appendEnemyToList(objectDetails, x, y){
+    _appendEnemyToList($objectDetails, x, y){
         let object = {
             id: this.id++,
             pos: {
@@ -65,22 +65,22 @@ export default class Level {
             },
             value: 100,
             entity: {
-                type: objectDetails.type,
-                name: objectDetails.name,
-                height: objectDetails.height,
-                width: objectDetails.width,
-                texture: objectDetails.texture,
-                shape: objectDetails.shape,
-                friction: objectDetails.friction,
-                mass: objectDetails.mass,
-                restitution: objectDetails.restitution
+                type: $objectDetails.attr('type'),
+                name: $objectDetails.attr('name'),
+                height: $objectDetails.attr('height'),
+                width: $objectDetails.attr('width'),
+                texture: $objectDetails.attr('texture'),
+                shape: $objectDetails.attr('shape'),
+                friction: $objectDetails.attr('friction'),
+                mass: $objectDetails.attr('mass'),
+                restitution: $objectDetails.attr('restitution')
             }
         }
-        this.__private__.level.entityLists.targetList.push(object);
+        this.info.level.entityLists.targetList.push(object);
     }
     
     serialize() {
 
-        return JSON.stringify(this.__private__);
+        return JSON.stringify(this.info);
     }
 }

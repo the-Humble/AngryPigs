@@ -4,12 +4,12 @@
 export default class Request {
     constructor(name, type){
 
-        this.__private__ ={
+        this.request ={
             userid:"pg20jose",
             name,
             type,
-            payload: {}
-        };
+            payload:""
+        }
     }
     //Success Response
     //{
@@ -20,12 +20,12 @@ export default class Request {
     //}           
 
     set payload(value) {
-        let my = this.__private__;
+        let my = this.request;
         my.payload = value;
     }
     
     serialize() {
 
-        return JSON.stringify(this.__private__);
+        return JSON.stringify(this.request);
     }
 }

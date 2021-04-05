@@ -66,13 +66,39 @@ class Server {
         });
 
         this.api.post('/api/save', (request, response) =>{
-            this._parseLevel(request.body)
-            .then(levelJson=>{
-                //FIXME READ JSON
-                console.log(levelJson);
-            }).catch(error =>{
-                console.log('hi');
-            });
+            let answer = {
+                error: +1
+            }
+            let contents = request.body.payload;
+            if(request.body.type == "level" )
+            {
+                let file = `./data/${request.body.name}`;
+                FileSystem.writeFile(file, contents)
+                .then(event=>{
+                    answer = {
+                        name: `${request.body.name}`,
+                        bytes: Buffer.byteLength(request.body.payload),
+                        error: 0
+                    }
+                    response.send(JSON.stringify(answer));
+                });
+                
+            }
+            
+            if(request.body.type == "object" )
+            {
+                let file = `./data/library/${request.body.name}`;
+                FileSystem.writeFile(file, contents)
+                .then(event=>{
+                    answer = {
+                        name: `${request.body.name}`,
+                        bytes: Buffer.byteLength(request.body.payload),
+                        error: 0
+                    }
+                    response.send(JSON.stringify(answer));
+                })
+            }
+            
         });
 
         this.api.post('/api/load', (request, response) =>{
@@ -134,20 +160,12 @@ class Server {
             })
     }
 
-    _parseLevel(params){
-        return new Promise ((resolve, reject)=>{
-            resolve(JSON.parse(params));
-            let err = {};
-            reject(err);
-        })
-    }
-
     _gameObjectList(reply){
         return new Promise((resolve, reject) => {
             FileSystem.readdir( `./data/library`, {withFileTypes: true})
                 .then(fileNamelist =>{    
                     fileNamelist.forEach(element => {
-                        if(element.name.includes('object')){
+                        if(!element.name.includes('enemy')){
                             let newObj = {
                                 name: `${element.name}`.replace(".json", ""),
                                 filename: `${element.name}`
