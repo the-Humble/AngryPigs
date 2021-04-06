@@ -33,14 +33,12 @@ export default class Editor {
 
             })
             .catch(error => {this._showErrorDialog(error)});
-        
-        
-        
-        //Initialize the draggables
-        this._handleDraggableEdit();
 
         //Loads first level on startup
         this._loadLevelOnStartup();
+
+        //Handle DragEvents
+        this._handleDraggable();
 
         //Handle user save events
         //Load level characteristics on sidebar
@@ -113,7 +111,7 @@ export default class Editor {
             .then(objectDetails=> {
                 let $list = $(`<li name="${object.name}" value="${object.filename}"> </li>`);
                 let $el = $(`<div
-                                id = "${object.name}" 
+                                id = "${object.name}"
                                 class="obstacle debug draggable" 
                                 style = "width: ${objectDetails.width}px;
                                         height: ${objectDetails.height}px;
@@ -126,12 +124,13 @@ export default class Editor {
                             </div>`);
                 
                 let $newEl = this._addObjectData($el, objectDetails);
+                this._isDraggable($newEl);
                 $list.append($newEl);
+
                 $('#object-list').append($list);
-                this._handleDraggableObject();
             })
             .catch(err => this._showErrorDialog(err));
-        });
+        })
     }
 
     _loadObject(object){
@@ -210,12 +209,12 @@ export default class Editor {
     }
 
     _loadLevel(levelDetails){
-        //TODO: Load level itself
+        //Load level itself
         
         $('#edit-window').empty();
         levelDetails.level.entityLists.collidableList.forEach(object => {
             let $newEl = $(`<div 
-                            id = "obstacle-${this.objectID}"
+                            id = "obstacle-${this.objectID++}"
                             class="obstacle debug draggable" 
                             style = "position: absolute;
                                     top: ${object.pos.y}px;
@@ -230,15 +229,21 @@ export default class Editor {
             $newEl = this._addObjectData($newEl, object.entity);
 
             $('#edit-window').append($newEl);
-            this._handleDraggableObject();
-            this.objectID++;
+            this._isDraggable($newEl);
+            $newEl.on('contextmenu', event=>{
+                event.preventDefault();
+                let $target = $(event.target);
+                $target.remove();
+
+            })
+            
         })
 
-        //TODO: Add cannons and create cannon object
+        //Add cannons and create cannon object
         let cannon = levelDetails.level.catapult;
         let $cannon = $(`<div
                             id= "cannon"
-                            class="obstacle debug draggable"
+                            class="cannon debug"
                             style = "position: absolute;
                             top: ${cannon.pos.y}px;
                             left: ${cannon.pos.x}px;
@@ -246,16 +251,16 @@ export default class Editor {
                             height: 200px;
                             background: url(./images/catapult.png);
                             background-repeat: no-repeat;
-                            background-size: 100% 100%";
-                            draggable="true">
+                            background-size: 100% 100%;
+                            transform: scaleX;(-1);">
                         </div>`);
         $('#edit-window').append($cannon);
-        //TODO: Add Enemies and create enemy object
+        //Add Enemies and create enemy object
         
         levelDetails.level.entityLists.targetList.forEach(object => {
             let $newEn = $(`<div 
-                            id = "enemy-${this.targetID}"
-                            class="obstacle debug draggable" 
+                            id = "enemy-${this.targetID++}"
+                            class="enemy debug draggable" 
                             style = "position: absolute;
                                     top: ${object.pos.y}px;
                                     left: ${object.pos.x}px;
@@ -268,20 +273,18 @@ export default class Editor {
                             </div>`)
             $newEn = this._addObjectData($newEn, object.entity);
             $('#edit-window').append($newEn);
-            this.targetID++;
+            this._isDraggable($newEn);
+            $newEn.on('contextmenu', event=>{
+                event.preventDefault();
+                let $target = $(event.target);
+                $target.remove();
+
+            })
         })
     }
 
-    _handleDraggableObject(){
-        $('.draggable')
-            .on('dragstart', event => {
-                this._onDraggableDragStart(event);
+    _handleDraggable(){      
 
-            })
-    }
-
-    _handleDraggableEdit(){
-             
         $('#edit-window')
             .on('mousemove', event =>{
                 event.preventDefault();
@@ -289,52 +292,99 @@ export default class Editor {
             })
             .on('dragover', event=>{
                 event.preventDefault();
-                this._onEditWindowDragOver(event);
             })
             .on('drop', event=>{
-                event.preventDefault();
-                this._onEditWindowDrop(event);
+                this.$dragTarget = $(event.target);
+                
+                //get embeded transfer data
+                let rawData = event.originalEvent.dataTransfer.getData("text");
+                let transferData = JSON.parse(rawData);
+
+                this.offset.x = event.clientX - Math.floor( event.target.offsetLeft);
+                this.offset.y = event.clientY - Math.floor( event.target.offsetTop);
+
+                if(transferData.targetId.includes('enemy')){
+                    let $newEn = $(`<div 
+                            id = "enemy-${this.targetID++}"
+                            class="enemy debug draggable" 
+                            style = "position: absolute;
+                                    top: ${this.offset.y}px;
+                                    left: ${this.offset.x}px;
+                                    width: ${transferData.gameParams.width}px;
+                                    height: ${transferData.gameParams.height}px;
+                                    background: url(${transferData.gameParams.texture});
+                                    background-repeat: no-repeat;
+                                    background-size: 100% 100%"
+                            draggable="true">
+                            </div>`)
+                    $newEn = this._addObjectData($newEn, transferData.gameParams);
+                    $('#edit-window').append($newEn);
+                    this._isDraggable($newEn);
+                    $newEn.on('contextmenu', event=>{
+                        event.preventDefault();
+                        let $target = $(event.target);
+                        $target.remove();
+
+                    })
+                }
+                else if (transferData.targetId.includes('cannon')){
+
+                }else{
+                    //create new element in right location
+                    let $newEl = $(`<div 
+                            id = "obstacle-${this.objectID++}"
+                            class="obstacle debug draggable" 
+                            style = "position: absolute;
+                                    top: ${this.offset.y}px;
+                                    left: ${this.offset.x}px;
+                                    width: ${transferData.gameParams.width}px;
+                                    height: ${transferData.gameParams.height}px;
+                                    background: url(${transferData.gameParams.texture});
+                                    background-repeat: no-repeat;
+                                    background-size: 100% 100%"
+                            draggable="true">
+                            </div>`);
+                    //$('#edit-window').append($el);
+                    $newEl = this._addObjectData($newEl, transferData.gameParams);
+                    
+                    this.$dragTarget.append($newEl);
+                    this._isDraggable($newEl);
+                    $newEl.on('contextmenu', event=>{
+                        event.preventDefault();
+                        let $target = $(event.target);
+                        $target.remove();
+
+                    })
+                }
+                
             });
     }
 
-    _cssFrom (left, top){
-        return {
-            position: "absolute",
-            margin: "0px",
-            left: left,
-            top: top
-        };
-    }
 
-    _onDraggableDragStart(event){
-        let $event = $(`#${event.target.id}`);
-        let transferData = {
-            targetId : event.target.id,
-            gameParams: {
-                type: `${$event.attr('type')}`,
-                name: `${$event.attr('name')}`,
-                height: `${$event.attr('height')}`,
-                width: `${$event.attr('width')}`,
-                texture: `${$event.attr('texture')}`,
-                shape: `${$event.attr('shape')}`,
-                friction: `${$event.attr('friction')}`,
-                mass: `${$event.attr('mass')}`,
-                restitution: `${$event.attr('restitution')}`
-            }
-        };
+    _isDraggable($newEl){
+        $newEl.on('dragstart', event => {
+            let $event = $(`#${event.target.id}`);
+            let transferData = {
+                targetId : event.target.id,
+                gameParams: {
+                    type: `${$event.attr('type')}`,
+                    name: `${$event.attr('name')}`,
+                    height: `${$event.attr('height')}`,
+                    width: `${$event.attr('width')}`,
+                    texture: `${$event.attr('texture')}`,
+                    shape: `${$event.attr('shape')}`,
+                    friction: `${$event.attr('friction')}`,
+                    mass: `${$event.attr('mass')}`,
+                    restitution: `${$event.attr('restitution')}`
+                }
+            };
 
-        //Attach transfer data
-        event.originalEvent.dataTransfer.setData("text", JSON.stringify(transferData));
-        event.originalEvent.dataTransfer.effectAllowed = "move";
+            //Attach transfer data
+            event.originalEvent.dataTransfer.setData("text", JSON.stringify(transferData));
+            event.originalEvent.dataTransfer.effectAllowed = "move";
 
-        //grab offset
-        this.$dragTarget = $(event.target);
+        })
         
-        this.offset.x = event.clientX - Math.floor( event.target.offsetLeft);
-        this.offset.y = event.clientY - Math.floor( event.target.offsetTop);
-        
-        //old z index
-        this.z = this.$dragTarget.css("zIndex");
     }
 
     _onEditWindowMouseMove(event){
@@ -342,41 +392,6 @@ export default class Editor {
         this.offset.x = Math.floor( event.target.offsetLeft);
         this.offset.y = Math.floor( event.target.offsetTop);
         $('#info-window').html(`Mouse at: (${event.clientX-this.offset.x}, ${event.clientY-this.offset.y})`);
-    }
-
-    _onEditWindowDragOver(event)
-    {
-        this.$dragTarget = $(event.target);
-
-        this.offset.x = event.clientX - Math.floor( event.target.offsetLeft);
-        this.offset.y = event.clientY - Math.floor( event.target.offsetTop);
-
-        //update the css for the drag target
-        let left = `${event.clientX-this.offset.x}px`;
-        let top = `${event.clientY-this.offset.y}px`;
-    }
-
-    _onEditWindowDrop(event){
-
-        this.$dragTarget = $(event.target);
-
-        //get embeded transfer data
-        let rawData = event.originalEvent.dataTransfer.getData("text");
-        let transferData = JSON.parse(rawData);
-
-        //TODO:attach transferData.gameParams to something
-        
-
-        //TODO: create new element in right location
-        //FIXME: Procedurally generate ids
-        let $el = $(`<div 
-                        id="box-${this.objectID++}" 
-                        class="draggable" 
-                        draggable = "true">
-                    </div>`);
-        //$('#edit-window').append($el);
-        this.$dragTarget.append($el);
-        $el.css(this._cssFrom(this.$dragTarget.css('left'), this.$dragTarget.css('top')));
     }
 
     _handleSaveEvents(){

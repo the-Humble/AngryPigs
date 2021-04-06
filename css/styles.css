@@ -39,7 +39,13 @@
 }
 
 .obstacle{
+    
+    border: 2px solid green;
    
+}
+
+.enemy{
+    border: 2px solid red;
 }
 
 .draggable{
@@ -51,6 +57,6 @@
 }
 
 .debug{
-    border: 2px solid green;
 }
+
 
