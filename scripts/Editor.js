@@ -38,7 +38,7 @@ export default class Editor {
         this._loadLevelOnStartup();
 
         //Handle DragEvents
-        this._handleDraggable();
+        this._handleEventListeners();
 
         //Handle user save events
         //Load level characteristics on sidebar
@@ -72,10 +72,16 @@ export default class Editor {
             });
     }
 
+    //Updates the level list at the top left of the screen
     _updateLevelList(levelList){
+
+        //Calls the level list option selector
         const $optionId = $('#level-list');
+        
+        //Empties it out before building it again
         $optionId.empty();
 
+        //Adds an element to the list for every existing level
         levelList.payload.forEach(element => {
 
             let $newOption = $(`<option value = "${element.filename}">${element.name}</option>`);
@@ -83,10 +89,11 @@ export default class Editor {
         });
     }
 
+    //Gathers the object list based on all the objects that exist
     _populateGameObjectList(){
 
         return new Promise( (resolve, reject) =>{
-            //do some work async
+            //Gets object list async
              $.post('/api/get_object_list',{
                 userId: "pg20jose",
                 type: "object"
@@ -103,16 +110,25 @@ export default class Editor {
         });
     }
 
+    //Gives the object its properties correctly and adds it to the object list
     _generateObject(gameObjects){
+
+        //Empties the list to fully rebuild
         $('#object-list').empty();
+
+        //For every object received in the response, create an object for the sidebar
         gameObjects.payload.forEach(object =>{
+            //Gets object data from the files and attach it to the objects in the sidebar
             this._loadObject(object)
+            //Parses object data
             .then(objectDetails => JSON.parse(objectDetails.payload)) 
             .then(objectDetails=> {
+
+                //Creates object in sidebar
                 let $list = $(`<li name="${object.name}" value="${object.filename}"> </li>`);
                 let $el = $(`<div
                                 id = "${object.name}"
-                                class="obstacle debug draggable" 
+                                class="debug draggable" 
                                 style = "width: ${objectDetails.width}px;
                                         height: ${objectDetails.height}px;
                                         background: url(${objectDetails.texture});
@@ -123,16 +139,23 @@ export default class Editor {
                                 draggable="true">
                             </div>`);
                 
+                //Ads jquery data to the object 
                 let $newEl = this._addObjectData($el, objectDetails);
+                
+                //Makes the object draggable
                 this._isDraggable($newEl);
+
+                //Appends object to the list object
                 $list.append($newEl);
 
+                //appends list object to list
                 $('#object-list').append($list);
             })
             .catch(err => this._showErrorDialog(err));
         })
     }
 
+    //Loads Object data into a javascript onbject 
     _loadObject(object){
         return new Promise((resolve, reject) => {
             $.post('/api/load', {
@@ -152,6 +175,7 @@ export default class Editor {
         })
     }
 
+    //Adds object data as JQuery attributes to the object
     _addObjectData($el, objectDetails){
         $el.attr("type", objectDetails.type);
         $el.attr("name", objectDetails.name);
@@ -165,6 +189,7 @@ export default class Editor {
         return $el;
     }
 
+    //Loads level 1 on startup of the app (requires first level being called level_1.json)
     _loadLevelOnStartup(){
         $.post('/api/load', {
             userId: "pg20jose",
@@ -174,14 +199,18 @@ export default class Editor {
         .then(levelDetails => JSON.parse(levelDetails))
         .then(levelDetails => JSON.parse(levelDetails.payload))
         .then(levelDetails => {
+            //Loads level sidebar in with appropriate data
             this._loadSidebar(levelDetails);
+            //Loads level using the level details
             this._loadLevel(levelDetails);
             
         })
         .catch(error => this._showErrorDialog(error));
     }
 
+    //Makes Sure a new level is loaded when it is selected
     _loadOnLevelChange(){
+        //Gathers level data from server
         $('#level-list')
             .on('change', event =>{
                 $.post('/api/load', {
@@ -192,15 +221,19 @@ export default class Editor {
                 .then(levelDetails => JSON.parse(levelDetails))
                 .then(levelDetails => JSON.parse(levelDetails.payload))
                 .then(levelDetails => {
+                    //Loads sidebar
                     this._loadSidebar(levelDetails);
+                    //Loads level
                     this._loadLevel(levelDetails);
                     
                 })
+                //Sends an error
                 .catch(error => this._showErrorDialog(error));
             });
             
     }
 
+    //Loads level information into the sidebar textfields
     _loadSidebar(levelDetails){
         $('#name-text').val(`${levelDetails.level.name}`);
         $('#shots-text').val(`${levelDetails.level.ammo}`);
@@ -210,8 +243,10 @@ export default class Editor {
 
     _loadLevel(levelDetails){
         //Load level itself
-        
+        //Empties previously loaded level
         $('#edit-window').empty();
+
+        //Creates obstacles in edit window
         levelDetails.level.entityLists.collidableList.forEach(object => {
             let $newEl = $(`<div 
                             id = "obstacle-${this.objectID++}"
@@ -226,9 +261,13 @@ export default class Editor {
                                     background-size: 100% 100%"
                             draggable="true">
                             </div>`);
+
+             //Adds object data to the object themselves               
             $newEl = this._addObjectData($newEl, object.entity);
 
+            //Appends objects to the window
             $('#edit-window').append($newEl);
+            //Makes object draggable
             this._isDraggable($newEl);
             $newEl.on('contextmenu', event=>{
                 event.preventDefault();
@@ -254,9 +293,12 @@ export default class Editor {
                             background-size: 100% 100%;
                             transform: scaleX;(-1);">
                         </div>`);
+    
+        //Adds cannon to editor object
         $('#edit-window').append($cannon);
-        //Add Enemies and create enemy object
         
+        
+        //Add Enemies and create enemy object
         levelDetails.level.entityLists.targetList.forEach(object => {
             let $newEn = $(`<div 
                             id = "enemy-${this.targetID++}"
@@ -271,9 +313,16 @@ export default class Editor {
                                     background-size: 100% 100%"
                             draggable="true">
                             </div>`)
+
+            //Adds enemy data to the enemies
             $newEn = this._addObjectData($newEn, object.entity);
+            
+            //Appends object to edit window
             $('#edit-window').append($newEn);
+            //Makes the objects draggable
             this._isDraggable($newEn);
+
+            //Makes object deletable on rightClick
             $newEn.on('contextmenu', event=>{
                 event.preventDefault();
                 let $target = $(event.target);
@@ -283,16 +332,21 @@ export default class Editor {
         })
     }
 
-    _handleDraggable(){      
+    //Makes the event listener on the editor
+    _handleEventListeners(){      
 
         $('#edit-window')
+            //Handles events when the mouse gets over the editor window
             .on('mousemove', event =>{
                 event.preventDefault();
                 this._onEditWindowMouseMove(event);
             })
+            //Whenever a drag event is called on top of the editor
             .on('dragover', event=>{
                 event.preventDefault();
             })
+
+            //Whenever a drag event is ended on top of the editor, create an object in the location
             .on('drop', event=>{
                 this.$dragTarget = $(event.target);
                 
@@ -300,9 +354,11 @@ export default class Editor {
                 let rawData = event.originalEvent.dataTransfer.getData("text");
                 let transferData = JSON.parse(rawData);
 
+                //Check location of the drop
                 this.offset.x = event.clientX - Math.floor( event.target.offsetLeft);
                 this.offset.y = event.clientY - Math.floor( event.target.offsetTop);
 
+                //Get transferData of the object to determine the type of object it is and how to render and categorize
                 if(transferData.targetId.includes('enemy')){
                     let $newEn = $(`<div 
                             id = "enemy-${this.targetID++}"
@@ -316,7 +372,7 @@ export default class Editor {
                                     background-repeat: no-repeat;
                                     background-size: 100% 100%"
                             draggable="true">
-                            </div>`)
+                            </div>`)        
                     $newEn = this._addObjectData($newEn, transferData.gameParams);
                     $('#edit-window').append($newEn);
                     this._isDraggable($newEn);
@@ -327,9 +383,7 @@ export default class Editor {
 
                     })
                 }
-                else if (transferData.targetId.includes('cannon')){
-
-                }else{
+                else{
                     //create new element in right location
                     let $newEl = $(`<div 
                             id = "obstacle-${this.objectID++}"
@@ -361,9 +415,11 @@ export default class Editor {
     }
 
 
+    //Makes objects draggable
     _isDraggable($newEl){
         $newEl.on('dragstart', event => {
             let $event = $(`#${event.target.id}`);
+            //Adds transfer data to the object for whenever an event is called on it
             let transferData = {
                 targetId : event.target.id,
                 gameParams: {
@@ -387,6 +443,8 @@ export default class Editor {
         
     }
 
+
+    //Shoiws position of mouse in editor window
     _onEditWindowMouseMove(event){
         
         this.offset.x = Math.floor( event.target.offsetLeft);
@@ -394,6 +452,7 @@ export default class Editor {
         $('#info-window').html(`Mouse at: (${event.clientX-this.offset.x}, ${event.clientY-this.offset.y})`);
     }
 
+    //Makes it so that the positions of the objects are saved into the specified file, creating a new one if necessary
     _handleSaveEvents(){
         $('#save-button').on('click', event=>{
             let level = new Request($('#filename-text').val(), "level");
@@ -411,11 +470,13 @@ export default class Editor {
                     levelDetails.catapult.pos.y = this.offsetTop;
                 }
                 
+                //Append every single object to the object list
                 if(`${$(this).attr('id')}`.includes("obstacle"))
                 {
                     levelPayload._appendObjectToList($(this), this.offsetLeft, this.offsetTop);
                 }
 
+                //Append enemies to the target list
                 if(`${$(this).attr('id')}`.includes("enemy"))
                 {
                     levelPayload._appendEnemyToList($(this), this.offsetLeft, this.offsetTop);
@@ -423,6 +484,7 @@ export default class Editor {
                 
             })
 
+            //Make file a string to be readable
             level.payload = levelPayload.serialize();
 
             $.post('/api/save', level.request)
@@ -432,10 +494,12 @@ export default class Editor {
             });
         });
 
+        //Creates an object based on the daa
         $('#create-object-button').on('click', event=>{
             let name = `${$('#object-name-text').val().toLowerCase().replace(" ", "_")}.json`
             let object = new Request(name, "object")
             
+            //Add object details to the file to save
             let objectDetails = {
                 type: `${$('#object-type-text').val()}`,
                 name: `${$('#object-name-text').val()}`,
@@ -450,6 +514,7 @@ export default class Editor {
 
             object.payload = JSON.stringify(objectDetails);
 
+            //Send string to the server for it to be saved as a file
             $.post('/api/save', object.request)
             .then(answer => JSON.parse(answer))
             .then(answer=>{

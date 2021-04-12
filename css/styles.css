@@ -5,6 +5,7 @@
 }
 
 .flex-container{
+    height: 720px;
     display: flex;
     justify-content: center;
     width: fit-content;
@@ -16,7 +17,11 @@
 
 .flex-item{
     flex-grow: 1;
-    padding: 1rem; 
+    display: flex;
+    overflow-y: auto;
+    padding-left: 1rem;
+    padding-top: 1rem;  
+    
 }
 
 .info-form-area{
@@ -36,16 +41,24 @@
     height: 100%;
     background-color: yellow;
     padding: 0;
+    overflow: hidden;
 }
 
 .obstacle{
-    
-    border: 2px solid green;
+    display: flex;
+    min-height: min-content;
    
 }
 
 .enemy{
-    border: 2px solid red;
+}
+
+.object-list{
+    display: flex;
+    list-style: none; 
+    padding:0; 
+    align-items: center;
+    flex-direction: column; 
 }
 
 .draggable{
