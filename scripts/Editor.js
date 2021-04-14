@@ -245,7 +245,8 @@ export default class Editor {
         //Load level itself
         //Empties previously loaded level
         $('#edit-window').empty();
-
+        this.objectID=0;
+        this.targetID=0;
         //Creates obstacles in edit window
         levelDetails.level.entityLists.collidableList.forEach(object => {
             let $newEl = $(`<div 
@@ -291,7 +292,7 @@ export default class Editor {
                             background: url(./images/catapult.png);
                             background-repeat: no-repeat;
                             background-size: 100% 100%;
-                            transform: scaleX;(-1);">
+                            transform: scaleX(-1);">
                         </div>`);
     
         //Adds cannon to editor object

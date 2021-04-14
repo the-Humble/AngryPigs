@@ -30,6 +30,13 @@ class Server {
         });
 
         //Serve editor page
+        this.api.get('/game', (request, response) =>{
+
+            let indexFile = `${Path.join(__dirname, './')}game.html`;
+            response.sendFile(indexFile, {title:`${this.title} AngryPigs`});
+        });
+
+        //Serve editor page
         this.api.get('/editor', (request, response) =>{
 
             let indexFile = `${Path.join(__dirname, './')}editor.html`;
