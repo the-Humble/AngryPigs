@@ -5,40 +5,64 @@
 }
 
 .flex-container{
+    height: 720px;
     display: flex;
     justify-content: center;
     width: fit-content;
 }
 
 .flex-center-item{
-    flex-grow: 2;
+
 }
 
 .flex-item{
     flex-grow: 1;
-    padding: 1rem; 
+    display: flex;
+    overflow-y: auto;
+    padding-left: 1rem;
+    padding-top: 1rem;  
+    
 }
 
 .info-form-area{
+    display: flex;
     flex-flow: column;
     flex-wrap: nowrap;
 }
 
 
 .editor{
-    width: 720px;
-    height: 480px; 
+    width: 1280px;
+    height: 720px; 
 }
 
 #edit-window{
+    position: relative;
     height: 100%;
     background-color: yellow;
+    padding: 0;
+    overflow: hidden;
 }
 
 .obstacle{
-   border: 2px solid green;
-    width: fit-content;
-    height: 2rem; 
+    display: flex;
+    min-height: min-content;
+   
+}
+
+.enemy{
+}
+
+.object-list{
+    display: flex;
+    list-style: none; 
+    padding:0; 
+    align-items: center;
+    flex-direction: column; 
+}
+
+.draggable{
+    cursor:move
 }
 
 .feedback{
@@ -46,6 +70,6 @@
 }
 
 .debug{
-
 }
+
 

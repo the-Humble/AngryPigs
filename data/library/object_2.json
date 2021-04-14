@@ -1,0 +1,11 @@
+{
+    "type": 0,
+    "name": "Stone Box",
+    "height": 60,
+    "width": 40,
+    "texture": "../images/stoneBox.png",
+    "shape": "square",
+    "friction": 1,
+    "mass": 100,
+    "restitution": 0
+}

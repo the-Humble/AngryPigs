@@ -1,0 +1,147 @@
+Level Editor Server API
+The Catapults Level Editor (CLE) Server
+
+The server manages individual user files containing level data and objects for use in levels generated with editor applications.  The server is a PHP application deployed to the VFS internal web server pgwm.vfs.local under the name CLE.   This server has a simple API that allows users to POST commands to save and load levels and objects generated with their level editor applications.
+get_level_list
+
+Used to retrieve the list of levels (json files) saved for a registered User.
+URL: /api/get_level_list/
+Request params
+
+{
+    "userid": <valid vfs username>, eg pg15student
+}
+
+Success Response
+
+{
+    "payload": [
+        { name: "level_name": filename: "actual_filename.json"}',
+        { name: "level_name": filename: "actual_filename.json"}',
+    ],
+    "error": 0
+}
+
+Error Response
+Condition: If 'userid' does not exist.
+
+{
+    "error": 1+ // Greater than zero on error
+}
+
+Allows receiver to verify with:
+
+if (response.error) { ... }
+
+
+
+get_object_list
+
+Loads a level or object back from the server
+URL: /api/get_object_list/
+Request params
+
+{
+    "userid": <valid vfs username>, eg pg15student
+}
+
+Success Response
+
+{
+    "payload": [
+        { name: "object_name": filename: "actual_filename.json"}',
+        { name: "object_name": filename: "actual_filename.json"}',
+    ], 
+    "error": 0 
+} 
+
+Error Response
+Condition : If 'userid' does not exist.
+
+{
+    "error": 1+ // Greater than zero on error
+}   
+
+save
+
+Saves a level or an obstacle in the library
+URL: /api/save/
+Request params
+
+{
+    "userid": "valid vfs username", // eg pg15student
+    "name": "filename", // name of entity, no spaces, no extension
+    "type": "object" | "level", // one of these two key strings
+    "payload": "JSONString" // actual data in JSON format 
+}    
+
+Success Response
+
+{
+    "name": "requested entity name",
+    "bytes": "actual bytes written",
+    "error": 0
+}   
+
+Error Response
+Condition: If 'userid' does not exist or file could not be written to the server.
+
+{
+    "error": 1+ // Greater than zero on error
+}    
+
+
+
+load
+
+Loads an entity from the server by name.
+URL: /api/load/
+Request params
+
+{
+    "userid": "valid vfs username", // eg pg15student
+    "name": "filename", // name of entity, no spaces, no extension
+    "type": "object" | "level", // one of these two key strings
+}
+
+Success Response
+
+{
+    "name": "requested entity name",
+    "payload": "JSONString" // actual data in JSON format 
+    "bytes": "actual bytes read",
+    "error": 0
+}
+
+Error Response
+Condition: If 'userid' does not exist or file could not be written to the server.
+
+{
+    "error": 1+ // Greater than zero on error
+}    
+
+
+Overview
+
+The goal is to produce a physics based shooting game where the player has control of a single “catapult” that fires projectiles.   This assignment will have each student create a client server application that allows the editing of levels for the game.
+
+One of the keys to the game is to have multiple “levels” or puzzles to solve, and the most expedient way to achieve that goal is to construct a full level editor, the Catapults Level Editor (CLE).    
+
+The format for the data is specified in the game design overview, along with additional information for the Catapults Game, and as discussed in class.
+Evaluation
+
+10% - Submission, code in source control, readme, instructions, following directions
+40% - Functionality meets requirements/app that edits levels and saves them in the specified format.
+20% - PHP Server that meets the design criteria, AJAX server.
+20% - HTML5 interactive UI for the level editor and AJAX client.
+10% - Coding Style, Simplicity, elegance and maintainability of final solution
+
+Submission:
+
+    Submit a single file "Release Notes.txt" written in your favourite text editor (see Readme.md)
+    Include the Name of the product, the date and developer.
+    Include a description of HOW to use the product
+    Ensure that all files are in the source control system
+
+* Do not email submission, upload to external services, attempt to upload large zip files.  If in doubt submit early.
+
