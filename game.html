@@ -1,0 +1,33 @@
+<!--Copyright (C) Jose Ignacio Ferrer Vera-->>
+<!DOCTYPE html>
+
+<html>
+    <head>
+    <link rel="stylesheet" type="text/css" href="css/styles.css">
+    <!-- Scripts here are external libs -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>AngryPigs Game</h1>
+    </header>
+    <main>
+        <section id="game-wrapper" class = "flex-container" style="border: 5px solid;">
+            <div id="game-area" class="game flex-center-item">
+                <div id="game-window" class="box-border">
+                    <!--Dynamically Loaded Levels in here-->
+                </div>
+
+            </div>
+
+        </section>
+
+        <div id="info-window" class="feedback"></div>
+    </main>
+    <footer style="text-align: center;">
+        Copyright (C) 2021 Jose Ignacio Ferrer Vera, Ana Carolina Arellano
+    </footer>
+    <script type="module" src="./game.js"></script>
+</body>
+</html>
