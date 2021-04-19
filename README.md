@@ -1,7 +1,7 @@
 # *** PG20 T2 JavaScript Web Apps  - AngryPigs Level Editor ***
 ---------------------------------------
 Jose Ignacio Ferrer Vera
-31/03/2021
+2021
 
 Level Editor for the Angry Birds homage game, Angry Pigs. 
 
@@ -23,6 +23,7 @@ This project was created as part of an assignement for Vancouver Film School's P
 ## Contributors 
 ---------------
 Jose Ignacio Ferrer Vera - Created Level Editor, Generated Server API
+Ana Carolina Arellano - Worked in Game development and Design, helped in polish and physics
 Shan Hodgson - Mentor
 Scott Henshaw - Teacher
 
@@ -54,4 +55,4 @@ JQuery: https://api.jquery.com/jQuery.post/
 
 # *** Caveats *** (optional)
 ---------------------------------------
-Very much a WIP at the moment, manmy standard features may still be missing.
+Very much a WIP at the moment, many standard features may still be missing.

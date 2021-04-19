@@ -49,11 +49,6 @@ export default class Editor {
 
     }
 
-
-    run(){
-
-    }
-
     _showErrorDialog(error){
         //TODO: build a dialog system for shooting error messages
 
@@ -287,11 +282,12 @@ export default class Editor {
                             style = "position: absolute;
                             top: ${cannon.pos.y}px;
                             left: ${cannon.pos.x}px;
-                            width: 150px;
-                            height: 150px;
-                            background: url(./images/sprites/moving.gif);
+                            width: 100px;
+                            height: 100px;
+                            background: url(./images/catapult.png);
                             background-repeat: no-repeat;
-                            background-size: 100% 100%;">
+                            background-size: 100% 100%;
+                            transform: scaleX(-1);">
                         </div>`);
     
         //Adds cannon to editor object

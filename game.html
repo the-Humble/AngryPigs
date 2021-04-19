@@ -4,9 +4,9 @@
 <html>
     <head>
     <link rel="stylesheet" type="text/css" href="css/styles.css">
-    <link rel="stylesheet" type="text/css" href="css/stylesCaro.css">
     <!-- Scripts here are external libs -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./scripts/libs/Box2dWeb-2.1.a.3.min.js"></script>
 </head>
 
 <body>
@@ -15,19 +15,21 @@
     </header>
     <main>
         <section id="game-wrapper" class = "flex-container" style="border: 5px solid;">
-            <div id="game-area" class="game flex-center-item">
-                <div id="game-window" class="box-border">
+            <div id="game-area" class="flex-center-item">
+                <div id="game-window" class="box-border game">
                     <!--Dynamically Loaded Levels in here-->
                 </div>
+
             </div>
 
         </section>
 
-        
+        <div id="info-window" class="feedback"></div>
     </main>
     <footer style="text-align: center;">
         Copyright (C) 2021 Jose Ignacio Ferrer Vera, Ana Carolina Arellano
     </footer>
+    
     <script type="module" src="./game.js"></script>
 </body>
 </html>
