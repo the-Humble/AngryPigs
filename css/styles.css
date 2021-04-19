@@ -5,6 +5,8 @@
 }
 
 .flex-container{
+    margin-right: auto;
+    margin-left: auto;
     height: 720px;
     display: flex;
     justify-content: center;
@@ -12,27 +14,7 @@
 }
 
 .flex-center-item{
-    height: 100%;
-}
 
-.game{
-    width: 1280px;
-    height: 720px;
-    position: relative;
-    background: url("../images/background.png");
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    padding: 0;
-    overflow: hidden;
-}
-
-#floor{
-    position: absolute;
-    left: 0px;
-    top: 710px;
-    width: 1280px;
-    height: 5px;
-    border: 2px solid black;
 }
 
 .flex-item{
@@ -45,6 +27,7 @@
 }
 
 .info-form-area{
+    margin-right: 30px;
     display: flex;
     flex-flow: column;
     flex-wrap: nowrap;
@@ -59,7 +42,7 @@
 #edit-window{
     position: relative;
     height: 100%;
-    background-color: yellow;
+    background-color: #b5c6c6;
     padding: 0;
     overflow: hidden;
 }
@@ -91,5 +74,6 @@
 
 .debug{
 }
+
 
 
