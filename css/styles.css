@@ -1,8 +1,8 @@
 /*Copyright (C) 2021 Jose Ignacio Ferrer Vera*/
 
-.box-border{
+/*.box-border{
     border: 2px solid red;
-}
+}*/
 
 .flex-container{
     margin-right: auto;
@@ -11,10 +11,15 @@
     display: flex;
     justify-content: center;
     width: fit-content;
+    margin-bottom: 20px;
+    padding: 5px;
 }
 
 .flex-center-item{
-
+    background-color: #b5c6c6;
+    width: 1280px;
+    height: 720px;
+    margin-bottom: 20px;
 }
 
 .flex-item{

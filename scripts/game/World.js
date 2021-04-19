@@ -87,6 +87,7 @@ export default class World {
         this.entityList.forEach(gameObj =>{
             gameObj.render(dt);
         })
+        this.World.render();
     }
 
     getModel() { return this.model; }
@@ -138,7 +139,7 @@ export default class World {
                             left: ${cannon.pos.x}px;
                             width: 100px;
                             height: 100px;
-                            background: url(./images/catapult.png);
+                            background: url(./images/sprites/moving.gif);
                             background-repeat: no-repeat;
                             background-size: 100% 100%;
                             transform: scaleX(-1);">
@@ -160,8 +161,7 @@ export default class World {
                                     height: ${object.entity.height}px;
                                     background: url(${object.entity.texture});
                                     background-repeat: no-repeat;
-                                    background-size: 100% 100%"
-                            >
+                                    background-size: 100% 100%">
                             </div>`)
 
             //Adds enemy data to the enemies
