@@ -9,13 +9,16 @@ const TIMESTEP = 1/60;
 const VELOCITY = 3;
 const POSITION = 3;
 
+const COOLDOWN = 3;
 
 export default class World {
     constructor( $el ){
         let gravity = new Physics.Vec2(0, Physics.GRAVITY);
 
+        this.shotCooldown = 3;
         this.level = new Level(); //TODO: Get Level Object 
         this.entityList = [] //List of game Objects
+        this.enemyList = [] //List of killable enemies
 
         this.$gameArea = $el;
         this.model = new Physics.World(gravity);
@@ -32,10 +35,23 @@ export default class World {
                 console.log(err);
             })
 
-        this.addListener();
+        this.addListeners();
     }
 
-    addListener(){
+    addListeners(){
+        //Mouse Move listener
+        $('#game-window')
+            //Handles events when the mouse gets over the editor window
+            .on('mousemove', event =>{
+                event.preventDefault();
+                this._onEditWindowMouseMove(event);
+            })
+            .on('click', event =>{
+                event.preventDefault();
+                this._shootPlayer();
+            })
+
+        //Physics Listener
         const listener = new Physics.Listener(); 
 
         listener.BeginContact = contact =>{
@@ -95,8 +111,7 @@ export default class World {
     _populateEntityList(levelDetails){
         //Load level itself
         //Empties previously loaded level
-        //FIXME:Remove comment
-        //$('#game-window').empty();
+        $('#game-window').empty();
         this.objectID=0;
         this.targetID=0;
         let position;
@@ -120,7 +135,7 @@ export default class World {
             $newEl = this._addObjectData($newEl, object.entity);
             position = object.pos;
 
-            //Creates new GameObject
+            //Creates new GameObject to entity list, to be updated
             this.entityList.push(new GameObject(this, position, $newEl))
 
             //Appends objects to the window
@@ -195,5 +210,9 @@ export default class World {
     _createBoundaries(){
 
         new GameObject(this, {}, this.$gameArea, true);
+    }
+
+    _shootPlayer(){
+        this.entityList.push()
     }
 }

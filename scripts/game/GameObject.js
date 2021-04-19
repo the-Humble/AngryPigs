@@ -43,6 +43,7 @@ export default class GameObject {
 
         return {
             domObj: $el,
+            type: $el.attr('type'),
             width: parseInt($el.attr('width')),
             height: parseInt($el.attr('height')),
             shape: `${$el.attr('shape')}`,
