@@ -13,8 +13,6 @@
 
 // Some global stuff we need
 // Shorthand "imports"
-import Box2D from './Box2dWeb-2.1.a.3.min.js';
-
 const Physics = {
     Vec2:           Box2D.Common.Math.b2Vec2,
 
@@ -40,7 +38,11 @@ const Physics = {
     RAD_2_DEG:      180 / Math.PI,    // CONSTANT to Multiply by to convert radians to degrees.
     TWO_PI:         Math.PI * 2,     // 360 degrees in radians.
 
-    WORLD_SCALE:    20.0,  // number of pixels per meter in the physics sim
+    WORLD_SCALE:    80.0,  // number of pixels per meter in the physics sim
+    
+    WIDTH: 1280 / 80, //Width in meters
+    HEIGHT: 720 / 80, //Height in meters
+    
     GRAVITY:        9.8    // The force of gravity
 }
 

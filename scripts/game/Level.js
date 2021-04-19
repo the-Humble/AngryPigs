@@ -8,8 +8,19 @@ import GameObject from './GameObject.js';
 export default class Level{
 
     constructor(filename = 'level_1.json'){
-        this.entityList = [] //A list of GameObjects
+        this.filename = filename;
     }
 
-
+    load(){
+        return new Promise((resolve, reject) => {
+            $.post('/api/load', {
+                userId: "pg20jose",
+                name: this.filename,
+                type: "level" 
+            })
+            .then(levelDetails => {
+                resolve(levelDetails);
+            })
+        })
+    }
 }

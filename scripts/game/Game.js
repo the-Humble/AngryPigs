@@ -1,11 +1,12 @@
 //Copyright (C) Jose Ignacio Ferrer Vera
 'use strict';
 
-import World from "./World";
+import World from "./World.js";
 
 export default class Game{
 
     constructor(){
+        this.lastUpdate = 0;
         this.gameState = Game.STATE.SPLASH;
         this.world = new World($('#game-area'));
         //load the level
@@ -16,6 +17,13 @@ export default class Game{
             //win/lose
 
         //start listening
+
+        $('#game-window')
+            //Handles events when the mouse gets over the editor window
+            .on('mousemove', event =>{
+                event.preventDefault();
+                this._onEditWindowMouseMove(event);
+            })
     }
 
     static get STATE() {
@@ -33,6 +41,7 @@ export default class Game{
        
         if (this.gameState != Game.STATE.GAME)
         {
+            this.gameState = Game.STATE.GAME;
             return;
         }
         //update special things
@@ -48,10 +57,19 @@ export default class Game{
     run( timestep = 0 ) {
 
         let dt = timestep - this.lastUpdate;
+        this.lastUpdate=timestep;
 
         this.update( dt );
         this.render( dt );
 
-        window.requestAnimationFrame( dt => this.run( dt / 100 ));
+        window.requestAnimationFrame( timestep => this.run( timestep / 100 ));
+    }
+
+        //Shoiws position of mouse in editor window
+    _onEditWindowMouseMove(event){
+        
+        let x = Math.floor( event.target.offsetLeft);
+        let y = Math.floor( event.target.offsetTop);
+        $('#info-window').html(`Mouse at: (${event.clientX-320}, ${event.clientY-114})`);
     }
 }
