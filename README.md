@@ -54,13 +54,14 @@ The game responds to the input provided by the user with the mouse, which by cli
 
 ## API Reference 
 ---------------
-Node.js: https://nodejs.org/en/docs/
-JQuery: https://api.jquery.com/jQuery.post/
+- Node.js: https://nodejs.org/en/docs/
+- JQuery: https://api.jquery.com/jQuery.post/
+- Box 2D: https://box2d.org/documentation/
 
 ## Credits 
 ---------------
-Pet sprites retrieved from: [https://heamomo.itch.io/pet?download] http://www.reddit.com
-Cannon sprites retrieved from: [https://kingkelp.itch.io/old-cannon] https://kingkelp.itch.io/old-cannon
+- Pet sprites retrieved from: [https://heamomo.itch.io/pet?download] http://www.reddit.com
+- Cannon sprites retrieved from: [https://kingkelp.itch.io/old-cannon] https://kingkelp.itch.io/old-cannon
 
 # *** Caveats *** (optional)
 ---------------------------------------
