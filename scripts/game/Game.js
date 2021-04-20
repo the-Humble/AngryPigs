@@ -15,7 +15,8 @@ export default class Game{
             //aim cannon
             //fire cannon
             //win/lose
-
+        this.gameOver = false;
+        this.win = false;
         //start listening
 
         $('#game-window')
@@ -26,6 +27,7 @@ export default class Game{
             })
     }
 
+    //
     static get STATE() {
         //GameState
         return{

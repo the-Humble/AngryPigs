@@ -114,6 +114,7 @@ export default class World {
         this.entityList.forEach(gameObj =>{
             gameObj.render(dt);
         })
+        this.World.render();
     }
 
     getModel() { return this.model; }
@@ -140,7 +141,7 @@ export default class World {
                             left: ${cannon.pos.x}px;
                             width: 100px;
                             height: 100px;
-                            background: url(./images/catapult.png);
+                            background: url(./images/sprites/moving.gif);
                             background-repeat: no-repeat;
                             background-size: 100% 100%;
                             transform: scaleX(-1);">
@@ -148,6 +149,26 @@ export default class World {
     
         //Adds cannon to editor object
         $('#game-window').append($cannon);
+        
+        
+        //Add Enemies and create enemy object
+        levelDetails.level.entityLists.targetList.forEach(object => {
+            let $newEn = $(`<div 
+                            id = "enemy-${this.targetID++}"
+                            class="enemy debug" 
+                            style = "position: absolute;
+                                    top: ${object.pos.y}px;
+                                    left: ${object.pos.x}px;
+                                    width: ${object.entity.width}px;
+                                    height: ${object.entity.height}px;
+                                    background: url(${object.entity.texture});
+                                    background-repeat: no-repeat;
+                                    background-size: 100% 100%">
+                            </div>`)
+
+            //Adds enemy data to the enemies
+            $newEn = this._addObjectData($newEn, object.entity);
+            position = object.pos;
 
         //Add Enemies and create enemy object
         levelDetails.level.entityLists.targetList.forEach(element => {
