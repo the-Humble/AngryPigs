@@ -1,1 +1,1 @@
-{"type":"0","name":"Ladder","height":"200","width":"20","texture":"../images/ladder.png","shape":"square","friction":".6","mass":"10","restitution":".2"}
+{"type":"1","name":"Ladder","height":"200","width":"20","texture":"../images/ladder.png","shape":"square","friction":".6","mass":"10","restitution":".2"}
