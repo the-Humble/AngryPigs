@@ -1,9 +1,9 @@
-# *** PG20 T2 JavaScript Web Apps  - AngryPigs Level Editor ***
+# *** PG20 T2 JavaScript Web Apps  - AngryRabbits vs Foxes Game ***
 ---------------------------------------
-Jose Ignacio Ferrer Vera
+Jose Ignacio Ferrer Vera and Ana Carolina Arellano Alvarez
 2021
 
-Level Editor for the Angry Birds homage game, Angry Pigs. 
+Angry Rabbits vs Foxes is a homage game for Angry Birds. 
 
 Git Repo: https://github.com/the-Humble/AngryPigs
 
@@ -23,7 +23,7 @@ This project was created as part of an assignement for Vancouver Film School's P
 ## Contributors 
 ---------------
 Jose Ignacio Ferrer Vera - Created Level Editor, Generated Server API
-Ana Carolina Arellano - Worked in Game development and Design, helped in polish and physics
+Ana Carolina Arellano - Worked in Game development and Design, helped in polish, animations and physics
 Shan Hodgson - Mentor
 Scott Henshaw - Teacher
 
@@ -31,27 +31,36 @@ Scott Henshaw - Teacher
 ---------------------------------------
 Travel to the git Repository
 
-Open the Editor Branch
+Open the master Branch
 
 Clone repository using clone link: https://github.com/the-Humble/AngryPigs.git
 
-Install Node dependencies
+On your machine's terminal go to the AngryPigs folder (cloned in the previus step)
 
-Run server from Visual Studio Workspace, making sure launch file is configured for Node.js
+Install Node dependencies using the comand `npm install`
 
-Go to localhost:3000/editor
+Run the game by using the command `node server.js` 
+
+In your web browser go to localhost:3000
+
+This will show you the splash screen, in which you can decide the level you want to play, see the instructions, go to the level editor or directly go to the game by clicking "play" 
 
 
 # *** How to use ***
 ---------------------------------------
-Available Levels can be seen in the drop down to the left of the screen. Once you select a level it is loaded and must be saved for any changes to be communicated to the server.
-Objects can be seen to the left. To create new objects, you may use the menu at the bottom of the screen
-Objects can be placed from the right sidebar into the actual level, and the program will save its position.
+In the menu showed on localhost:3000 you can choose which level to play, there are a couple of previously created levels. 
+To begin playing, click the "play" button. which will redirect you to the game page, which will display the chosen level and animated elements, as well their physics properties.
+The game responds to the input provided by the user with the mouse, which by clicking it shoots bombs to the enemies, the foxes.
 
 ## API Reference 
 ---------------
-Node.js :https://nodejs.org/en/docs/
+Node.js: https://nodejs.org/en/docs/
 JQuery: https://api.jquery.com/jQuery.post/
+
+## Credits 
+---------------
+Pet sprites retrieved from: [https://heamomo.itch.io/pet?download] http://www.reddit.com
+Cannon sprites retrieved from: [https://kingkelp.itch.io/old-cannon] https://kingkelp.itch.io/old-cannon
 
 # *** Caveats *** (optional)
 ---------------------------------------
