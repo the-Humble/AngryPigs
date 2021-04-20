@@ -1,1 +1,1 @@
-{"type":"0","name":"Mossy Crate","height":"50","width":"200","texture":"../images/mossyCrate.png","shape":"square","friction":"3","mass":"40","restitution":"1"}
+{"type":"0","name":"Mossy Crate","height":"50","width":"200","texture":"../images/mossyCrate.png","shape":"square","friction":"1","mass":"80","restitution":".4"}
