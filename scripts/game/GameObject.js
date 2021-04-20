@@ -5,12 +5,15 @@ import Physics from '../libs/Physics.js';
 
 export default class GameObject {  
     
-    constructor( world, element, id, isStatic = false) {
+    constructor( world, element, id) {
+        this.id = id;
         this.controller = world;    
         this.$object = this._createElement(element);
-        if(element.type == 1)
+        if(element.entity.type == 1)
         {
             this.$object = this._createEnemy(element);
+        }else if(element.entity.type == 2){
+            this.$object = this._createCannonball(element);
         }
 
         this.rotation = 0;
@@ -30,18 +33,18 @@ export default class GameObject {
         }
 
         this.box2DSize = {
-            width:(element.entity.width/Physics.WORLD_SCALE)/4,
-            height:(element.entity.height/Physics.WORLD_SCALE)/4,
-            radius: element.entity.width/Physics.WORLD_SCALE
+            width: (element.entity.width/Physics.WORLD_SCALE)/2,
+            height:(element.entity.height/Physics.WORLD_SCALE)/2,
+            radius: (element.entity.width/Physics.WORLD_SCALE)/2
         }    
 
         // some local and constructor stuff here    
         this.box2DPos = {
-            x: (this.domPos.left /Physics.WORLD_SCALE) - Physics.WIDTH/2,
-            y: (this.domPos.top / Physics.WORLD_SCALE) - Physics.HEIGHT/2
+            x: (element.pos.x+(element.entity.width/2))/Physics.WORLD_SCALE,
+            y: (element.pos.y+(element.entity.width/2))/Physics.WORLD_SCALE
         };
 
-        this.model = this._createModel( this.box2DPos, this.box2DSize);
+        this.body = this._createModel( this.box2DPos, this.box2DSize);
             
         
         //Reset DOM object position for use with CSS3 positioning    
@@ -76,11 +79,9 @@ export default class GameObject {
 
     _createElement(element){
         let $newEl = $(`<div 
-                            id = "obstacle-${this.objectID++}"
+                            id = "obstacle-${this.id}"
                             class="obstacle debug" 
                             style = "position: absolute;
-                                    top: ${element.pos.y}px;
-                                    left: ${element.pos.x}px;
                                     width: ${element.entity.width}px;
                                     height: ${element.entity.height}px;
                                     background: url(${element.entity.texture});
@@ -97,11 +98,9 @@ export default class GameObject {
 
     _createEnemy(element){
         let $newEn = $(`<div 
-                            id = "enemy-${this.targetID++}"
+                            id = "enemy-${this.id}"
                             class="enemy debug" 
                             style = "position: absolute;
-                                    top: ${element.pos.y}px;
-                                    left: ${element.pos.x}px;
                                     width: ${element.entity.width}px;
                                     height: ${element.entity.height}px;
                                     background: url(${element.entity.texture});
@@ -114,6 +113,25 @@ export default class GameObject {
             $newEn = this._addObjectData($newEn, element.entity);
 
             return $newEn;
+    }
+
+    _createCannonball(element){
+        let $newEl = $(`<div 
+                            id = "cannonball-${this.id}"
+                            class="obstacle debug" 
+                            style = "position: absolute;
+                                    width: ${element.entity.width}px;
+                                    height: ${element.entity.height}px;
+                                    background: url(${element.entity.texture});
+                                    background-repeat: no-repeat;
+                                    background-size: 100% 100%"
+                            >
+                            </div>`);
+
+            //Adds object data to the object themselves               
+            $newEl = this._addObjectData($newEl, element.entity);
+
+            return $newEl;
     }
 
     _createModel( box2DPos, box2DSize) {    
@@ -135,8 +153,7 @@ export default class GameObject {
         if(this.userData.shape == 'circle')
         {
             fixDefn.shape = new Physics.CircleShape();
-            fixDefn.shape.radius = box2DSize.radius;
-
+            fixDefn.shape.SetRadius( box2DSize.radius );
         }
         
         let density = this.userData.mass / (box2DSize.width * box2DSize.height * 4);
@@ -171,17 +188,17 @@ export default class GameObject {
     }
 
     update( dt ){
-        this.box2DPos.x = this.model.GetPosition().x;
-        this.box2DPos.y = this.model.GetPosition().y;
-
-        this.domPos.left = Math.floor(this.box2DPos.x*Physics.WORLD_SCALE + 640);
-        this.domPos.top = Math.floor(this.box2DPos.y*Physics.WORLD_SCALE + 360);
-        //this.rotation = this.model.GetAngle()*Physics.RAD_2_DEG;
+        this.box2DPos.x = this.body.GetPosition().x;
+        this.box2DPos.y = this.body.GetPosition().y;
+        this.rotation = Math.floor(this.body.GetAngle()*Physics.RAD_2_DEG);
+    
+        this.domPos.left = (this.box2DPos.x *Physics.WORLD_SCALE)-(this.domSize.width/2);
+        this.domPos.top = (this.box2DPos.y *Physics.WORLD_SCALE)-(this.domSize.height/2);
+        
     }
 
     render( dt ){
         this.$object.css({
-            
             'transform': `translate(${this.domPos.left}px, ${this.domPos.top}px) rotate(${this.rotation}deg)`}, 
             );
     }

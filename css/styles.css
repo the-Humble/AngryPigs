@@ -77,6 +77,21 @@
 
 }
 
+.flex-center-item{
+    height: 100%;
+}
+
+.game{
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    background: url("../images/background.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    padding: 0;
+    overflow: hidden;
+}
+
 .debug:before {
     content:"";
     position:absolute;

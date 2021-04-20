@@ -9,6 +9,5 @@ import Editor from './scripts/Editor.js';
     $(document).ready( event => {
 
         const app = new Editor();
-        app.run();
     })
 })()
