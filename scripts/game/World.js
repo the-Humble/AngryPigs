@@ -150,26 +150,6 @@ export default class World {
         //Adds cannon to editor object
         $('#game-window').append($cannon);
         
-        
-        //Add Enemies and create enemy object
-        levelDetails.level.entityLists.targetList.forEach(object => {
-            let $newEn = $(`<div 
-                            id = "enemy-${this.targetID++}"
-                            class="enemy debug" 
-                            style = "position: absolute;
-                                    top: ${object.pos.y}px;
-                                    left: ${object.pos.x}px;
-                                    width: ${object.entity.width}px;
-                                    height: ${object.entity.height}px;
-                                    background: url(${object.entity.texture});
-                                    background-repeat: no-repeat;
-                                    background-size: 100% 100%">
-                            </div>`)
-
-            //Adds enemy data to the enemies
-            $newEn = this._addObjectData($newEn, object.entity);
-            position = object.pos;
-
         //Add Enemies and create enemy object
         levelDetails.level.entityLists.targetList.forEach(element => {
             //Creates new GameObject
