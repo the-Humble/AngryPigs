@@ -18,6 +18,12 @@ export default class Game{
 
         //start listening
 
+        $('#game-window')
+            //Handles events when the mouse gets over the editor window
+            .on('mousemove', event =>{
+                event.preventDefault();
+                this._onEditWindowMouseMove(event);
+            })
     }
 
     static get STATE() {
@@ -35,7 +41,6 @@ export default class Game{
        
         if (this.gameState != Game.STATE.GAME)
         {
-            //FIXME: Change state normally
             this.gameState = Game.STATE.GAME;
             return;
         }

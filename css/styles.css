@@ -89,7 +89,25 @@
 
 }
 
-.debug{
+.debug:before {
+    content:"";
+    position:absolute;
+    z-index:-1;
+    top:50%;
+    left:37%;
+    width:25%;
+    border-top: 1px dotted yellow;
 }
+
+.debug:after {
+    content:"";
+    position:absolute;
+    z-index:-1;
+    top:37%;
+    left:50%;
+    height:25%;
+    border-left: 1px dotted yellow;
+}
+
 
 

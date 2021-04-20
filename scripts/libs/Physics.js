@@ -40,10 +40,15 @@ const Physics = {
 
     WORLD_SCALE:    20.0,  // number of pixels per meter in the physics sim
     
+    SCREEN :{
+        HEIGHT: 720,
+        WIDTH: 1280
+    },
+
     WIDTH: 1280 / 20, //Width in meters
     HEIGHT: 720 / 20, //Height in meters
     
-    GRAVITY:        9.8    // The force of gravity
+    GRAVITY: 9.8    // The force of gravity
 }
 
 export default Physics;
