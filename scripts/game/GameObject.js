@@ -5,50 +5,62 @@ import Physics from '../libs/Physics.js';
 
 export default class GameObject {  
     
-    constructor( world, position, $el, isStatic = false) {
+    constructor( world, element, id, isStatic = false) {
         this.controller = world;    
-        this.$object = $el;
-        
+        this.$object = this._createElement(element);
+        if(element.type == 1)
+        {
+            this.$object = this._createEnemy(element);
+        }
+
         this.rotation = 0;
 
-        this.size = {
-            width:(parseInt(this.$object.attr("width"))/(Physics.WORLD_SCALE))/2,
-            height:(parseInt(this.$object.attr("height"))/(Physics.WORLD_SCALE))/2,
-            radius: parseInt(this.$object.attr("radius"))
+        this.userData = this._CreateUserData(element);
+
+        this.domSize = {
+            width: element.entity.width,
+            height: element.entity.height,
+            radius: element.entity.width //TODO: Include circle support
+
+        }
+
+        this.domPos = {
+            top: element.pos.y,
+            left: element.pos.x
+        }
+
+        this.box2DSize = {
+            width:(element.entity.width/Physics.WORLD_SCALE)/4,
+            height:(element.entity.height/Physics.WORLD_SCALE)/4,
+            radius: element.entity.width/Physics.WORLD_SCALE
         }    
 
         // some local and constructor stuff here    
-        this.pos = {
-            x: (position.x / Physics.WORLD_SCALE) + this.size.width,
-            y: (position.y / Physics.WORLD_SCALE) + + this.size.height
+        this.box2DPos = {
+            x: (this.domPos.left /Physics.WORLD_SCALE) - Physics.WIDTH/2,
+            y: (this.domPos.top / Physics.WORLD_SCALE) - Physics.HEIGHT/2
         };
-        
-        this.userData = this.SetUserData(this.$object);
-        
-        if(isStatic)
-        {
-            this._createTerrain();
-        }
-        else
-        {
-            this.model = this._createModel( this.pos, this.size, isStatic);
-        }  
+
+        this.model = this._createModel( this.box2DPos, this.box2DSize);
             
         
         //Reset DOM object position for use with CSS3 positioning    
-        this.$object.css({'left':`${position.x}`, 'top':`${position.y}`, 'transform': `rotate(${this.rotation})`});  
+        this.$object.css({'transform': `translate(${this.domPos.left}px, ${this.domPos.top}px) rotate(${this.rotation}deg)`});  
+        //Appends object to edit window
+        $('#game-window').append(this.$object);
     }
 
-    SetUserData( $el ){
+    _CreateUserData( element){
 
         return {
-            domObj: $el,
-            width: parseInt($el.attr('width')),
-            height: parseInt($el.attr('height')),
-            shape: `${$el.attr('shape')}`,
-            friction: parseInt($el.attr('friction')),
-            mass: parseInt($el.attr('mass')),
-            restitution: parseInt($el.attr('restitution'))
+            name: element.entity.name,
+            type: element.entity.type,
+            width: element.entity.width,
+            height: element.entity.height,
+            shape: element.entity.shape,
+            friction: element.entity.friction,
+            mass: element.entity.mass,
+            restitution: element.entity.restitution
         }
     }
 
@@ -62,11 +74,53 @@ export default class GameObject {
         }
     }
 
-    _createModel( pos, size, isStatic) {    
+    _createElement(element){
+        let $newEl = $(`<div 
+                            id = "obstacle-${this.objectID++}"
+                            class="obstacle debug" 
+                            style = "position: absolute;
+                                    top: ${element.pos.y}px;
+                                    left: ${element.pos.x}px;
+                                    width: ${element.entity.width}px;
+                                    height: ${element.entity.height}px;
+                                    background: url(${element.entity.texture});
+                                    background-repeat: no-repeat;
+                                    background-size: 100% 100%"
+                            >
+                            </div>`);
+
+            //Adds object data to the object themselves               
+            $newEl = this._addObjectData($newEl, element.entity);
+
+            return $newEl;
+    }
+
+    _createEnemy(element){
+        let $newEn = $(`<div 
+                            id = "enemy-${this.targetID++}"
+                            class="enemy debug" 
+                            style = "position: absolute;
+                                    top: ${element.pos.y}px;
+                                    left: ${element.pos.x}px;
+                                    width: ${element.entity.width}px;
+                                    height: ${element.entity.height}px;
+                                    background: url(${element.entity.texture});
+                                    background-repeat: no-repeat;
+                                    background-size: 100% 100%"
+                            >
+                            </div>`)
+
+            //Adds enemy data to the enemies
+            $newEn = this._addObjectData($newEn, element.entity);
+
+            return $newEn;
+    }
+
+    _createModel( box2DPos, box2DSize) {    
         
         let bodyDefn = new Physics.BodyDef();         
-        bodyDefn.position.x = pos.x;    
-        bodyDefn.position.y = pos.y;  
+        bodyDefn.position.x = box2DPos.x;    
+        bodyDefn.position.y = box2DPos.y;  
         
         
         bodyDefn.type = Physics.Body.b2_dynamicBody;
@@ -75,17 +129,17 @@ export default class GameObject {
         let fixDefn = new Physics.FixtureDef();
         
         //Set Shape
+        fixDefn.shape = new Physics.PolygonShape();
+        fixDefn.shape.SetAsBox(box2DSize.width, box2DSize.height);
+
         if(this.userData.shape == 'circle')
         {
             fixDefn.shape = new Physics.CircleShape();
-            fixDefn.shape.radius = size.radius;
+            fixDefn.shape.radius = box2DSize.radius;
 
-        }else{
-            fixDefn.shape = new Physics.PolygonShape();
-            fixDefn.shape.SetAsBox(size.width, size.height);
         }
         
-        let density = this.userData.mass / (size.width * size.height * 4);
+        let density = this.userData.mass / (box2DSize.width * box2DSize.height * 4);
         fixDefn.density = density; // density * area = mass    
         fixDefn.friction = this.userData.friction; // 1 = sticky, 0 = slippery    
         fixDefn.restitution = this.userData.restitution; // 1 = very bouncy, 0 =  no bounce     
@@ -94,53 +148,41 @@ export default class GameObject {
 
         let body = world.CreateBody( bodyDefn );   
         body.CreateFixture( fixDefn );
+        body.SetUserData(this.userData);
 
         return body;  
     }
 
-    _createTerrain(){
-        let world = this.controller.getModel();
+    
 
-        let bodyDefn = new Physics.BodyDef();
-        bodyDefn.type = Physics.Body.b2_staticBody;
-
-        let fixDefn = new Physics.FixtureDef();
-        fixDefn.shape = new Physics.PolygonShape();
-        fixDefn.restitution = 0;
-        fixDefn.friction = 0;
-
-
-        //create ground
-        fixDefn.shape.SetAsBox(Physics.WIDTH/2, .5);
-        bodyDefn.position.Set(Physics.WIDTH/2, Physics.HEIGHT-2);
-        world.CreateBody(bodyDefn).CreateFixture(fixDefn);
-
-        //Create roof
-        bodyDefn.position.Set(0, -1);
-        world.CreateBody(bodyDefn).CreateFixture(fixDefn);
-
-        //left wall
-        fixDefn.shape.SetAsBox(.5, Physics.HEIGHT/2);
-        bodyDefn.position.Set(-1, Physics.HEIGHT/2);
-        world.CreateBody(bodyDefn).CreateFixture(fixDefn);
-
-        //right wall
-        bodyDefn.position.Set(Physics.WIDTH/2, Physics.HEIGHT/2);
-        world.CreateBody(bodyDefn).CreateFixture(fixDefn);
-
+    //Adds object data as JQuery attributes to the object
+    _addObjectData($el, objectDetails){
+        $el.attr("type", objectDetails.type);
+        $el.attr("name", objectDetails.name);
+        $el.attr("name", objectDetails.name);
+        $el.attr("height", objectDetails.height);
+        $el.attr("width", objectDetails.width);
+        $el.attr("texture", `${objectDetails.texture}`);
+        $el.attr("shape", `${objectDetails.shape}`);
+        $el.attr("friction", `${objectDetails.friction}`);
+        $el.attr("mass", `${objectDetails.mass}`);
+        $el.attr("restitution", `${objectDetails.restitution}`);
+        return $el;
     }
 
     update( dt ){
-        this.pos.x = this.model.GetPosition().x;
-        this.pos.y = this.model.GetPosition().y;
-        this.rotation = this.model.GetAngle()*Physics.RAD_2_DEG;
+        this.box2DPos.x = this.model.GetPosition().x;
+        this.box2DPos.y = this.model.GetPosition().y;
+
+        this.domPos.left = Math.floor(this.box2DPos.x*Physics.WORLD_SCALE + 640);
+        this.domPos.top = Math.floor(this.box2DPos.y*Physics.WORLD_SCALE + 360);
+        //this.rotation = this.model.GetAngle()*Physics.RAD_2_DEG;
     }
 
     render( dt ){
-        this.userData.domObj.css({
-            'left':`${(this.pos.x * Physics.WORLD_SCALE) - this.size.width}px`, 
-            'top':`${(this.pos.y * Physics.WORLD_SCALE) - this.size.height}px`, 
-            'transform': `rotate(${this.rotation}deg)`}, 
+        this.$object.css({
+            
+            'transform': `translate(${this.domPos.left}px, ${this.domPos.top}px) rotate(${this.rotation}deg)`}, 
             );
     }
 }

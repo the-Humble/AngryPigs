@@ -9,16 +9,20 @@ const TIMESTEP = 1/60;
 const VELOCITY = 3;
 const POSITION = 3;
 
+const COOLDOWN = 3;
 
 export default class World {
     constructor( $el ){
-        let gravity = new Physics.Vec2(0, Physics.GRAVITY);
+        let gravity = new Physics.Vec2( 0, Physics.GRAVITY);
 
+        this.shotCooldown = 3;
         this.level = new Level(); //TODO: Get Level Object 
+
+        this.entityID = 0;
         this.entityList = [] //List of game Objects
 
         this.$gameArea = $el;
-        this.model = new Physics.World(gravity);
+        this.model = new Physics.World(gravity, true);
 
         this._createBoundaries();
 
@@ -32,10 +36,23 @@ export default class World {
                 console.log(err);
             })
 
-        this.addListener();
+        this._addListeners();
     }
 
-    addListener(){
+    _addListeners(){
+        //Mouse Move listener
+        $('#game-window')
+            //Handles events when the mouse gets over the editor window
+            .on('mousemove', event =>{
+                event.preventDefault();
+                this._onGameWindowMouseMove(event);
+            })
+            .on('click', event =>{
+                event.preventDefault();
+                this._shootPlayer(event);
+            })
+
+        //Physics Listener
         const listener = new Physics.Listener(); 
 
         listener.BeginContact = contact =>{
@@ -44,11 +61,16 @@ export default class World {
             let itemA = contact.GetFixtureA().GetBody().GetUserData();
             let itemB = contact.GetFixtureB().GetBody().GetUserData();
 
-            if ((itemA == null) || (itemB == null))
+            if ((itemA == null) || (itemB == null)){
                 return;
+            }
+
+            console.log(`${itemA.name} hit ${itemB.name}`);
+            
 
             //If colliding with boxes or environement do nothing
             //TODO: If Player hit enemy, do something 
+
             
 
         };
@@ -70,6 +92,11 @@ export default class World {
         
         this.model.SetContactListener(listener);
         
+    }
+
+    _findEnemies() {
+        let newList = this.entityList.map(value => { return{type, status}})
+            .filter((value, index) =>{value.type == 1})
     }
 
     update(dt){
@@ -96,37 +123,12 @@ export default class World {
     _populateEntityList(levelDetails){
         //Load level itself
         //Empties previously loaded level
-        //FIXME:Remove comment
-        //$('#game-window').empty();
-        this.objectID=0;
-        this.targetID=0;
-        let position;
+        $('#game-window').empty();
+        this.id=0;
         //Creates obstacles in edit window
-        levelDetails.level.entityLists.collidableList.forEach(object => {
-            let $newEl = $(`<div 
-                            id = "obstacle-${this.objectID++}"
-                            class="obstacle debug" 
-                            style = "position: absolute;
-                                    top: ${object.pos.y}px;
-                                    left: ${object.pos.x}px;
-                                    width: ${object.entity.width}px;
-                                    height: ${object.entity.height}px;
-                                    background: url(${object.entity.texture});
-                                    background-repeat: no-repeat;
-                                    background-size: 100% 100%"
-                            >
-                            </div>`);
-
-            //Adds object data to the object themselves               
-            $newEl = this._addObjectData($newEl, object.entity);
-            position = object.pos;
-
-            //Creates new GameObject
-            this.entityList.push(new GameObject(this, position, $newEl))
-
-            //Appends objects to the window
-            $('#game-window').append($newEl);
-                      
+        levelDetails.level.entityLists.collidableList.forEach(element => {
+            //Creates new GameObject to entity list, to be updated
+            this.entityList.push(new GameObject(this, element, this.id++))
         })
 
         //Add cannons and create cannon object
@@ -168,32 +170,57 @@ export default class World {
             $newEn = this._addObjectData($newEn, object.entity);
             position = object.pos;
 
+        //Add Enemies and create enemy object
+        levelDetails.level.entityLists.targetList.forEach(element => {
             //Creates new GameObject
-            this.entityList.push(new GameObject(this, position, $newEn))
-
-            //Appends object to edit window
-            $('#game-window').append($newEn);
+            this.entityList.push(new GameObject(this, element, this.id++))
             
         })
     }
 
-    //Adds object data as JQuery attributes to the object
-    _addObjectData($el, objectDetails){
-        $el.attr("type", objectDetails.type);
-        $el.attr("name", objectDetails.name);
-        $el.attr("name", objectDetails.name);
-        $el.attr("height", objectDetails.height);
-        $el.attr("width", objectDetails.width);
-        $el.attr("texture", `${objectDetails.texture}`);
-        $el.attr("shape", `${objectDetails.shape}`);
-        $el.attr("friction", `${objectDetails.friction}`);
-        $el.attr("mass", `${objectDetails.mass}`);
-        $el.attr("restitution", `${objectDetails.restitution}`);
-        return $el;
-    }
-
     _createBoundaries(){
 
-        new GameObject(this, {}, this.$gameArea, true);
+        //TODO:BUILD TERRAIN
+        let world = this.getModel();
+
+        let bodyDefn = new Physics.BodyDef();
+        bodyDefn.type = Physics.Body.b2_staticBody;
+
+        let fixDefn = new Physics.FixtureDef();
+        fixDefn.shape = new Physics.PolygonShape();
+        fixDefn.restitution = 0;
+        fixDefn.friction = 0;
+
+
+        //create ground
+        fixDefn.shape.SetAsBox(Physics.WIDTH/2, .5);
+        bodyDefn.position.Set(Physics.WIDTH/2, Physics.HEIGHT-.5);
+        world.CreateBody(bodyDefn).CreateFixture(fixDefn);
+
+        //Create roof
+        bodyDefn.position.Set(0, -1);
+        world.CreateBody(bodyDefn).CreateFixture(fixDefn);
+
+        //left wall
+        fixDefn.shape.SetAsBox(.5, Physics.HEIGHT/2);
+        bodyDefn.position.Set(-1, Physics.HEIGHT/2);
+        world.CreateBody(bodyDefn).CreateFixture(fixDefn);
+
+        //right wall
+        bodyDefn.position.Set(Physics.WIDTH, Physics.HEIGHT/2);
+        world.CreateBody(bodyDefn).CreateFixture(fixDefn);
+        
+    }
+
+    _shootPlayer(){
+        this.entityList.push()
+    }
+
+        //Shoiws position of mouse in editor window
+    _onGameWindowMouseMove(event){
+        
+        let x = Math.floor( event.target.offsetLeft);
+        let y = Math.floor( event.target.offsetTop);
+        $('#info-window').html(`Mouse at: (${event.clientX-320}, ${event.clientY-114})`);
     }
 }
