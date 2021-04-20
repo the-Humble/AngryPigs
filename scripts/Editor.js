@@ -49,11 +49,6 @@ export default class Editor {
 
     }
 
-
-    run(){
-
-    }
-
     _showErrorDialog(error){
         //TODO: build a dialog system for shooting error messages
 
@@ -287,8 +282,8 @@ export default class Editor {
                             style = "position: absolute;
                             top: ${cannon.pos.y}px;
                             left: ${cannon.pos.x}px;
-                            width: 200px;
-                            height: 200px;
+                            width: 100px;
+                            height: 100px;
                             background: url(./images/catapult.png);
                             background-repeat: no-repeat;
                             background-size: 100% 100%;
