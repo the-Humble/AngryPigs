@@ -5,7 +5,7 @@
     "width": 40,
     "texture": "../images/stoneBox.png",
     "shape": "square",
-    "friction": 1,
+    "friction": 0.9,
     "mass": 100,
     "restitution": 0
 }

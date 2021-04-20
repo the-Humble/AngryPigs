@@ -5,7 +5,7 @@
     "width": 70,
     "texture": "../images/woodenCrate.png",
     "shape": "square",
-    "friction": 1,
+    "friction": 0.7,
     "mass": 90,
     "restitution": 0
 }
