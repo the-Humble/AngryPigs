@@ -5,7 +5,7 @@ import World from "./World.js";
 
 export default class Game{
 
-    constructor(){
+    constructor(levelname){
         this.lastUpdate = 0;
         this.gameState = Game.STATE.SPLASH;
         this.world = new World($('#game-area'));
@@ -49,7 +49,7 @@ export default class Game{
         //update special things
 
        //update the world
-       this.world.update(dt);
+       this.world.update(dt);       
     }
 
     render( dt ) {

@@ -26,6 +26,7 @@ export default class World {
 
         this.$gameArea = $el;
         this.model = new Physics.World(gravity, true);
+        this.points = 0;
         
         this._createBoundaries();
 
@@ -43,7 +44,8 @@ export default class World {
 
         this._addListeners();
     }
-
+    //returns points earned
+    get POINTS(){ return this.points };
     _addListeners(){
         //Mouse Move listener
         $('#game-window')
@@ -73,11 +75,16 @@ export default class World {
             }
 
             console.log(`${itemA.name} hit ${itemB.name}`);
-            
-
             //If colliding with boxes or environement do nothing
-            //TODO: If Player hit enemy, do something 
-
+            //If Player hit enemy, do something 
+            if(`${itemB.name}` == "Cannonball")
+            {
+                if(`${itemA.name}` == "Ladder")
+                {
+                    this.points += 10;
+                    $('#points').html(`<p>${this.points}</p>`)
+                }
+            }
             
 
         };

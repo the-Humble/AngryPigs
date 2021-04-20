@@ -7,7 +7,15 @@
     <!-- Scripts here are external libs -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
-
+<script>
+    $(document).ready(function(){
+        $('#play').on('click', event =>{
+            //Application starts at chosen level
+            let levelName = $("#level-list").children("option:selected").val()
+            console.log(levelName)
+        });
+    });
+</script>
 <body>
     <header>
         <h1>AngryPigs</h1>
@@ -15,10 +23,10 @@
     <main>
         <!--set buttons to navigate-->
         <section id="menu" class="menu-buttons">
-            
-            <a href="./game.html"><div id="play" class="my-button">
+            <a href="./game.html"> <div id="play" class="my-button">
                 Play
             </div></a>
+        
             <div class="my-button">
                 <select id="level-list" name="level-name">
                     </select>
@@ -33,8 +41,9 @@
     <footer style="text-align: center;">
         Copyright (C) 2021 Jose Ignacio Ferrer Vera, Ana Carolina Arellano
     </footer>
-    <script type="module" src="scripts/Index.js"></script>
+    <script type="module" src="./scripts/Index.js"></script>
     <script type="module" src="./editor.js"></script>
+    
 </body>
 </html>
 <!--Pet sprites retrieved from: https://heamomo.itch.io/pet?download
