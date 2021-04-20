@@ -114,7 +114,6 @@ export default class World {
         this.entityList.forEach(gameObj =>{
             gameObj.render(dt);
         })
-        this.World.render();
     }
 
     getModel() { return this.model; }
