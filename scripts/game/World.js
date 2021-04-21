@@ -168,8 +168,7 @@ export default class World {
                             height: 100px;
                             background: url(./images/sprites/moving.gif);
                             background-repeat: no-repeat;
-                            background-size: 100% 100%;
-                            transform: scaleX(-1);">
+                            background-size: 100% 100%;">
                         </div>`);
     
         //Adds cannon to editor object
