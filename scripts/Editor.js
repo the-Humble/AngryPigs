@@ -284,7 +284,7 @@ export default class Editor {
                             left: ${cannon.pos.x}px;
                             width: 100px;
                             height: 100px;
-                            background: url(./images/catapult.png);
+                            background: url(./images/sprites/moving.gif;
                             background-repeat: no-repeat;
                             background-size: 100% 100%;">
                         </div>`);
