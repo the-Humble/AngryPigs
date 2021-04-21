@@ -41,11 +41,11 @@ export default class GameObject {
         // some local and constructor stuff here    
         this.box2DPos = {
             x: (element.pos.x+(element.entity.width/2))/Physics.WORLD_SCALE,
-            y: (element.pos.y+(element.entity.width/2))/Physics.WORLD_SCALE
+            y: (element.pos.y+(element.entity.height/2))/Physics.WORLD_SCALE
         };
 
         this.body = this._createModel( this.box2DPos, this.box2DSize);
-            
+        this.deleted = false;    
         
         //Reset DOM object position for use with CSS3 positioning    
         this.$object.css({'transform': `translate(${this.domPos.left}px, ${this.domPos.top}px) rotate(${this.rotation}deg)`});  
@@ -169,8 +169,6 @@ export default class GameObject {
 
         return body;  
     }
-
-    
 
     //Adds object data as JQuery attributes to the object
     _addObjectData($el, objectDetails){
