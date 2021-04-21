@@ -9,7 +9,10 @@ body{
 header h1{
     text-align: center;
     margin-top: 50px;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
+}
+header h2{
+    text-align: center;
 }
 .menu-buttons{
     padding-top: 55px;
@@ -38,7 +41,20 @@ header h1{
     text-align: center;
     margin-bottom: 30px;
 }
-
+.my-instructions{
+    padding-top: 55px;
+    background-color: #b5c6c6;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 70px;;
+    width: 400px;
+    height: 400px;
+}
+.my-animals{
+    flex-direction: row;
+    display: flex;
+    justify-content: space-between;
+}
 #rabbit-sprite {
     height: 64px;
     width: 64px;
