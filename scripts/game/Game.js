@@ -37,19 +37,28 @@ export default class Game{
    //update each frame
     update( dt ) {
        
-        if (this.gameState != Game.STATE.GAME)
+        if (this.gameState == Game.STATE.SPLASH)
         {
             this.gameState = Game.STATE.GAME;
             return;
         }
        //update the world
-       this.world.update(dt);       
+       if(this.gameState == Game.STATE.GAME) {
+           this.world.update(dt); 
+       }
+       
+       if(this.world.gameOver){
+           this.gameState = Game.STATE.RESULTS;
+       }
     }
 
     //render world items on given frame
     render( dt ) {
-        this.world.render(dt);
-    }
+
+        if(this.gameState == Game.STATE.GAME) {
+           this.world.render(dt); 
+       }
+   }
 
     //manage time of game / frames
     run( timestep = 0 ) {
