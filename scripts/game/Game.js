@@ -8,7 +8,7 @@ export default class Game{
     constructor(levelname){
         this.lastUpdate = 0;
         this.gameState = Game.STATE.SPLASH;
-        this.world = new World($('#game-area'));
+        this.world = new World($('#game-area'), levelname);
         //load the level
         //build world model
         //set up event handlers for user
