@@ -1,4 +1,4 @@
-//Copyright (C) Jose Ignacio Ferrer Vera
+//Copyright (C) 2021 Jose Ignacio Ferrer Vera and Ana Carolina Arellano
 'use strict';
 
 import Physics from '../libs/Physics.js';
@@ -6,6 +6,7 @@ import Physics from '../libs/Physics.js';
 export default class GameObject {  
     
     constructor( world, element, id) {
+        //set attributes of game objects
         this.id = id;
         this.controller = world;    
         this.$object = this._createElement(element);
@@ -19,26 +20,27 @@ export default class GameObject {
         this.rotation = 0;
 
         this.userData = this._CreateUserData(element);
-
+        //set size
         this.domSize = {
             width: element.entity.width,
             height: element.entity.height,
             radius: element.entity.width //TODO: Include circle support
 
         }
-
+        //set position 
         this.domPos = {
             top: element.pos.y,
             left: element.pos.x
         }
 
+        //set size of box2D
         this.box2DSize = {
             width: (element.entity.width/Physics.WORLD_SCALE)/2,
             height:(element.entity.height/Physics.WORLD_SCALE)/2,
             radius: (element.entity.width/Physics.WORLD_SCALE)/2
         }    
 
-        // some local and constructor stuff here    
+        // set position of box2D
         this.box2DPos = {
             x: (element.pos.x+(element.entity.width/2))/Physics.WORLD_SCALE,
             y: (element.pos.y+(element.entity.height/2))/Physics.WORLD_SCALE
@@ -53,8 +55,8 @@ export default class GameObject {
         $('#game-window').append(this.$object);
     }
 
+    //store the data of the element within variables
     _CreateUserData( element){
-
         return {
             name: element.entity.name,
             type: element.entity.type,
@@ -67,6 +69,7 @@ export default class GameObject {
         }
     }
 
+    //different types of objects
     static get OBJECTTYPE()
     {
         return {

@@ -7,12 +7,12 @@
     <!-- Scripts here are external libs -->
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     </head>
+    <!--Snippet of code that saves the level that the user selected-->
     <script>
         $(document).ready(function(){
+            //The name of the level will be saved when the play button is clicked
             $('#play').on('click', event =>{
-                //Application starts at chosen level
                 let levelName = $("#level-list").children("option:selected").val()
-                //alert(levelName)
                 localStorage.setItem("Level",levelName);
             });
         });
@@ -25,17 +25,20 @@
         <main>
             <!--set buttons to navigate-->
             <section id="menu" class="menu-buttons">
+                <!--Go to game -->
                 <a href="./game.html"> <div id="play" class="my-button">
                     Play
                 </div></a>
-            
+                <!--Select a level to play-->
                 <div class="my-button">
                     <select id="level-list" name="level-name">
                         </select>
                 </div>
+                <!--Go to the instructions-->
                 <a href="./instructions.html"><div id="instructions" class="my-button">
                     Instructions
                 </div></a>
+                <!--Go to editor-->
                 <a href="./editor.html"><div id="levelEditor" class="my-button">
                     Level Editor
                 </div></a>
