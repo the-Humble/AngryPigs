@@ -37,6 +37,7 @@ export default class Game{
    //update each frame
     update( dt ) {
        
+        //At the bieginning change the state
         if (this.gameState == Game.STATE.SPLASH)
         {
             this.gameState = Game.STATE.GAME;
@@ -47,6 +48,7 @@ export default class Game{
            this.world.update(dt); 
        }
        
+       //Stop time if game is over
        if(this.world.gameOver){
            this.gameState = Game.STATE.RESULTS;
        }

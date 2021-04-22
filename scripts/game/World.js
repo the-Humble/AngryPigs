@@ -290,6 +290,7 @@ export default class World {
         $('#info-window').html(`Mouse at: (${event.clientX-320}, ${event.clientY-180})`);
     }
 
+    //Resizes entity List after every update to keep loops as small as possible
     _resizeEntityList(){
         let removedIndex;
         let destroyedEntity = false;
@@ -315,6 +316,7 @@ export default class World {
 
     }
 
+    //Checks if the enemy hit was the last enmy remaining
     _checkWin(){
         let enemyExists = false;
         
