@@ -41,7 +41,7 @@ export default class Game{
 
     update( dt ) {
        
-        if (this.gameState != Game.STATE.GAME)
+        if (this.gameState == Game.STATE.SPLASH)
         {
             this.gameState = Game.STATE.GAME;
             return;
@@ -49,11 +49,19 @@ export default class Game{
         //update special things
 
        //update the world
-       this.world.update(dt);       
+       if(this.gameState == Game.STATE.GAME) {
+           this.world.update(dt); 
+       }
+       
+       if(this.world.gameOver){
+           this.gameState = Game.STATE.RESULTS;
+       }
     }
 
     render( dt ) {
-        this.world.render(dt);
+        if(this.gameState == Game.STATE.GAME) {
+           this.world.render(dt); 
+       }
    }
 
     run( timestep = 0 ) {

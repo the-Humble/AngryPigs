@@ -16,9 +16,16 @@ export default class World {
     constructor( $el , levelName){
         let gravity = new Physics.Vec2(0, Physics.GRAVITY);
 
+        if(levelName == null)
+        {
+            levelName = 'level_1.json';
+        }
+
+        this.gameOver = false;
         this.shotCooldown = COOLDOWN;
         this.shoot = true;
         this.level = new Level(levelName); //TODO: Get Level Object 
+        this.ammo;
 
         this.entityID = 0;
 
@@ -35,17 +42,19 @@ export default class World {
             .then(levelData => JSON.parse(levelData.payload))
             .then(levelData => {
                 this._populateEntityList(levelData);
-                
+                this.ammo = parseInt(levelData.level.ammo);
+                $('#ammo').html(`<p>${this.ammo}</p>`);
             })
             .catch(err=>{
                 console.log(err);
             })
 
-
+        this.cannonball;
         this._addListeners();
     }
     //returns points earned
     get POINTS(){ return this.points };
+
     _addListeners(){
         //Mouse Move listener
         $('#game-window')
@@ -58,6 +67,7 @@ export default class World {
                 event.preventDefault();
                 if(this.shoot){
                     this._shootPlayer(event);
+                    
                 }
             })
 
@@ -79,10 +89,10 @@ export default class World {
             //If Player hit enemy, do something 
             if(`${itemB.name}` == "Cannonball")
             {
-                if(`${itemA.name}` == "Ladder")
+                if(`${itemA.type}` == 1)
                 {
-                    this.points += 10;
-                    $('#points').html(`<p>${this.points}</p>`)
+                    this.points += 500;
+                    $('#points').html(`<p>${this.points}</p>`);
                 }
             }
             
@@ -97,23 +107,40 @@ export default class World {
             //Called after collision but before physics happen
         };
         
-        listener.PreSolve = (contact, impulse) =>{
+        listener.PostSolve = (contact, impulse) =>{
             //Called after collision but before physics happen
             //Place your stuff
             //TODO: WIN/LOSE Flags
+            let itemA = contact.GetFixtureA().GetBody().GetUserData();
+            let itemB = contact.GetFixtureB().GetBody().GetUserData();
 
+            if ((itemA == null) || (itemB == null)){
+                return;
+            }
+
+            console.log(`${itemA.name} hit ${itemB.name}`);
+            //If colliding with boxes or environement do nothing
+            //If Player hit enemy, do something 
+            if(`${itemB.name}` == "Cannonball")
+            {
+                if(`${itemA.type}` == 1)
+                {
+                    itemA.deleted = true;
+                }
+            }
         };
         
         this.model.SetContactListener(listener);
         
     }
 
-    _findEnemies() {
-        let newList = this.entityList.map(value => { return{type, status}})
-            .filter((value, index) =>{value.type == 1})
-    }
 
     _checkShoot(dt){
+        if(this.ammo < 0){
+            $('#ammo').html(`<p>YOU LOST!</p>`);
+            this.gameOver = true;
+            return;
+        }
         if(this.shotCooldown>COOLDOWN){
             this.shoot = true;
             return;
@@ -127,9 +154,16 @@ export default class World {
         this.model.ClearForces();
         
         this.entityList.forEach(gameObj =>{
-            gameObj.update(dt);
+            if(!gameObj.destroyed)
+            {
+                gameObj.update(dt);
+            }
+            
         })
         this.cannonball?.update(dt);
+
+        this._resizeEntityList();
+
         this._checkShoot(dt);
     }
 
@@ -219,6 +253,8 @@ export default class World {
     }
 
     _shootPlayer(event){
+        this.ammo--;
+        $('#ammo').html(`<p>${this.ammo}</p>`);
         let vel = this.cannonball.body.GetLinearVelocity();
         vel.x = 0;
         vel.y = 0;
@@ -245,5 +281,48 @@ export default class World {
         let x = Math.floor( event.target.offsetLeft);
         let y = Math.floor( event.target.offsetTop);
         $('#info-window').html(`Mouse at: (${event.clientX-320}, ${event.clientY-180})`);
+    }
+
+    _resizeEntityList(){
+        let removedIndex;
+        let destroyedEntity = false;
+        for(let i = 0; i< this.entityList.length; i++) {
+            if(this.entityList[i].destroyed){
+                removedIndex = i;
+                destroyedEntity = true;
+                break;
+            }
+        }
+
+        if(destroyedEntity){
+            if(removedIndex == this.entityList.length-1){
+                this.entityList.pop();
+                return;
+            }
+            let part1 = this.entityList.slice(0, removedIndex);
+            let part2 = this.entityList.slice(removedIndex+1, this.entityList.length);
+            this.entityList = part1.concat(part2);
+            
+            this._checkWin();
+        }
+
+    }
+
+    _checkWin(){
+        let enemyExists = false;
+        
+        this.entityList.forEach(entity=>{
+            if(entity.type == "1")
+            {
+                enemyExists = true;
+            }
+        })
+
+        if(!enemyExists){
+            $('#ammo').html(`<p>YOU WON!</p>`);
+            this.gameOver = true;
+            return;
+        }
+
     }
 }

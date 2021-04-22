@@ -15,10 +15,13 @@ export default class GameObject {
         }else if(element.entity.type == 2){
             this.$object = this._createCannonball(element);
         }
+        this.type = element.entity.type; 
 
         this.rotation = 0;
 
         this.userData = this._CreateUserData(element);
+
+        this.destroyed = false;
 
         this.domSize = {
             width: element.entity.width,
@@ -44,8 +47,7 @@ export default class GameObject {
             y: (element.pos.y+(element.entity.height/2))/Physics.WORLD_SCALE
         };
 
-        this.body = this._createModel( this.box2DPos, this.box2DSize);
-        this.deleted = false;    
+        this.body = this._createModel( this.box2DPos, this.box2DSize);  
         
         //Reset DOM object position for use with CSS3 positioning    
         this.$object.css({'transform': `translate(${this.domPos.left}px, ${this.domPos.top}px) rotate(${this.rotation}deg)`});  
@@ -63,7 +65,8 @@ export default class GameObject {
             shape: element.entity.shape,
             friction: element.entity.friction,
             mass: element.entity.mass,
-            restitution: element.entity.restitution
+            restitution: element.entity.restitution,
+            deleted: false
         }
     }
 
@@ -98,14 +101,10 @@ export default class GameObject {
 
     _createEnemy(element){
         let $newEn = $(`<div 
-                            id = "enemy-${this.id}"
+                            id = "fox-sprite"
                             class="enemy debug" 
                             style = "position: absolute;
-                                    width: ${element.entity.width}px;
-                                    height: ${element.entity.height}px;
-                                    background: url(${element.entity.texture});
-                                    background-repeat: no-repeat;
-                                    background-size: 100% 100%"
+                                    "
                             >
                             </div>`)
 
@@ -186,18 +185,31 @@ export default class GameObject {
     }
 
     update( dt ){
-        this.box2DPos.x = this.body.GetPosition().x;
-        this.box2DPos.y = this.body.GetPosition().y;
-        this.rotation = Math.floor(this.body.GetAngle()*Physics.RAD_2_DEG);
+        if(!this.userData.deleted)
+        {
+            this.box2DPos.x = this.body.GetPosition().x;
+            this.box2DPos.y = this.body.GetPosition().y;
+            this.rotation = Math.floor(this.body.GetAngle()*Physics.RAD_2_DEG);
     
-        this.domPos.left = (this.box2DPos.x *Physics.WORLD_SCALE)-(this.domSize.width/2);
-        this.domPos.top = (this.box2DPos.y *Physics.WORLD_SCALE)-(this.domSize.height/2);
-        
+            this.domPos.left = (this.box2DPos.x *Physics.WORLD_SCALE)-(this.domSize.width/2);
+            this.domPos.top = (this.box2DPos.y *Physics.WORLD_SCALE)-(this.domSize.height/2);
+            return;
+        }
+        if(!this.destroyed && this.userData.deleted)
+        {
+            this.$object.remove();
+            this.controller.getModel().DestroyBody(this.body);
+            this.destroyed = true;
+        }
+                
     }
 
     render( dt ){
-        this.$object.css({
+        if(!this.userData.deleted)
+        {
+            this.$object.css({
             'transform': `translate(${this.domPos.left}px, ${this.domPos.top}px) rotate(${this.rotation}deg)`}, 
             );
+        }
     }
 }
