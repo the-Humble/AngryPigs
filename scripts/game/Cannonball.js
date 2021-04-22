@@ -1,10 +1,10 @@
-//Copyright (C) Jose Ignacio Ferrer Vera
+//Copyright (C) Jose Ignacio Ferrer Vera and Ana Carolina Arellano
 'use strict';
 
 import GameObject from './GameObject.js'
 
 export default class Cannonball extends GameObject{
-    
+    //create cannon ball object with its physic properties and fixed position
     constructor(world, id){
         let element = {
             pos:{
@@ -23,6 +23,7 @@ export default class Cannonball extends GameObject{
                 restitution:0
             }
         }
+        //it is controlled by the world
         let controller = world;
         super(controller, element, id);
     }

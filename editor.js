@@ -7,7 +7,6 @@ import Editor from './scripts/Editor.js';
 (function Main() {
     
     $(document).ready( event => {
-
         const app = new Editor();
     })
 })()

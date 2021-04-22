@@ -1,4 +1,4 @@
-//Copyright (C) Jose Ignacio Ferrer Vera
+//Copyright (C) 2021 Jose Ignacio Ferrer Vera and Ana Carolina Arellano
 'use strict';
 
 import World from "./World.js";
@@ -7,17 +7,13 @@ export default class Game{
 
     constructor(levelname){
         this.lastUpdate = 0;
+        //set initial state
         this.gameState = Game.STATE.SPLASH;
-        this.world = new World($('#game-area'), levelname);
-        //load the level
         //build world model
-        //set up event handlers for user
-            //aim cannon
-            //fire cannon
-            //win/lose
+        this.world = new World($('#game-area'), levelname);
+        //win/lose
         this.gameOver = false;
         this.win = false;
-        //start listening
 
         $('#game-window')
             //Handles events when the mouse gets over the editor window
@@ -27,7 +23,6 @@ export default class Game{
             })
     }
 
-    //
     static get STATE() {
         //GameState
         return{
@@ -39,6 +34,7 @@ export default class Game{
         //Use check(Game.STATE.LOADING)
    }
 
+   //update each frame
     update( dt ) {
        
         if (this.gameState == Game.STATE.SPLASH)
@@ -46,8 +42,6 @@ export default class Game{
             this.gameState = Game.STATE.GAME;
             return;
         }
-        //update special things
-
        //update the world
        if(this.gameState == Game.STATE.GAME) {
            this.world.update(dt); 
@@ -58,12 +52,15 @@ export default class Game{
        }
     }
 
+    //render world items on given frame
     render( dt ) {
+
         if(this.gameState == Game.STATE.GAME) {
            this.world.render(dt); 
        }
    }
 
+    //manage time of game / frames
     run( timestep = 0 ) {
 
         let dt = timestep - this.lastUpdate;
@@ -75,7 +72,7 @@ export default class Game{
         window.requestAnimationFrame( timestep => this.run( timestep / 100 ));
     }
 
-        //Shoiws position of mouse in editor window
+    //Shoiws position of mouse in editor window
     _onEditWindowMouseMove(event){
         
         let x = Math.floor( event.target.offsetLeft);

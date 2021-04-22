@@ -1,4 +1,4 @@
-//Copyright (C) 2021 Jose Ignacio Ferrer Vera
+//Copyright (C) 2021 Jose Ignacio Ferrer Vera and Ana Carolina Arellano
 'use strict';
 
 import Physics from '../libs/Physics.js';
@@ -14,6 +14,7 @@ const COOLDOWN = 30;
 
 export default class World {
     constructor( $el , levelName){
+        //set attributes of the World
         let gravity = new Physics.Vec2(0, Physics.GRAVITY);
 
         if(levelName == null)
@@ -37,6 +38,7 @@ export default class World {
         
         this._createBoundaries();
 
+        //load level into the would
         this.level.load()
             .then(levelData => JSON.parse(levelData))
             .then(levelData => JSON.parse(levelData.payload))
@@ -48,8 +50,8 @@ export default class World {
             .catch(err=>{
                 console.log(err);
             })
-
         this.cannonball;
+
         this._addListeners();
     }
     //returns points earned
@@ -60,9 +62,9 @@ export default class World {
         $('#game-window')
             //Handles events when the mouse gets over the editor window
             .on('mousemove', event =>{
-                event.preventDefault();
+                event.preventDefault();//print position of mouse
                 this._onGameWindowMouseMove(event);
-            })
+            })  //click on the game window only work for shooting
             .on('click', event =>{
                 event.preventDefault();
                 if(this.shoot){
@@ -77,26 +79,25 @@ export default class World {
         listener.BeginContact = contact =>{
             //when things touch
 
+            //get items that are interacting
             let itemA = contact.GetFixtureA().GetBody().GetUserData();
             let itemB = contact.GetFixtureB().GetBody().GetUserData();
 
             if ((itemA == null) || (itemB == null)){
                 return;
             }
-
-            console.log(`${itemA.name} hit ${itemB.name}`);
-            //If colliding with boxes or environement do nothing
-            //If Player hit enemy, do something 
+            //Check if the cannon ball was one of the objects having contact
             if(`${itemB.name}` == "Cannonball")
             {
                 if(`${itemA.type}` == 1)
+
+                //and add it to the html
+
                 {
                     this.points += 500;
                     $('#points').html(`<p>${this.points}</p>`);
                 }
             }
-            
-
         };
 
         listener.EndContact = contact =>{
@@ -134,7 +135,7 @@ export default class World {
         
     }
 
-
+    //manage the cooldown of the cannon ball
     _checkShoot(dt){
         if(this.ammo < 0){
             $('#ammo').html(`<p>YOU LOST!</p>`);
@@ -150,9 +151,11 @@ export default class World {
     }
 
     update(dt){
+        //update every frame the model
         this.model.Step(TIMESTEP, VELOCITY, POSITION);
         this.model.ClearForces();
         
+        //update every frame the entity list
         this.entityList.forEach(gameObj =>{
             if(!gameObj.destroyed)
             {
@@ -160,6 +163,8 @@ export default class World {
             }
             
         })
+
+        //update every frame the cannon ball
         this.cannonball?.update(dt);
 
         this._resizeEntityList();
@@ -168,11 +173,11 @@ export default class World {
     }
 
     render(dt){
-        //FIXME: RENDERING IS KINDA BAD RIGHT NOW, need to fix positioning
-
+        //render each object
         this.entityList.forEach(gameObj =>{
             gameObj.render(dt);
         })
+        //render cannon ball
         this.cannonball?.render(dt);
     }
 
@@ -190,7 +195,7 @@ export default class World {
             this.entityList.push(new GameObject(this, element, this.entityID++))
         })
 
-        //Add cannons and create cannon object
+        //create cannon object
         let cannon = levelDetails.level.catapult;
         let $cannon = $(`<div
                             id= "cannon"
@@ -214,6 +219,7 @@ export default class World {
             this.entityList.push(new GameObject(this, element, this.entityID++))
             
         })
+        //create cannon ball
         this.cannonball = new Cannonball(this, this.entityID++);
         this.entityList.push(this.cannonball);
     }
@@ -252,6 +258,7 @@ export default class World {
         
     }
 
+    //parabolic shot from the cannon
     _shootPlayer(event){
         this.ammo--;
         $('#ammo').html(`<p>${this.ammo}</p>`);
@@ -275,7 +282,7 @@ export default class World {
         
     }
 
-        //Shoiws position of mouse in editor window
+    //Shows position of mouse in editor window
     _onGameWindowMouseMove(event){
         
         let x = Math.floor( event.target.offsetLeft);
