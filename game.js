@@ -7,8 +7,13 @@ import Game from './scripts/game/Game.js';
 (function Main() {
     
     $(document).ready( event => {
-
-        const app = new Game();
+        //get selected level from index
+        var level = localStorage.getItem("Level")
+        //call game and send level
+        const app = new Game(level);
+        //clear storage
+        localStorage.removeItem("Level");
+        localStorage.clear();
         app.run();
     })
 })()
