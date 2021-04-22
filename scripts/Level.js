@@ -1,4 +1,4 @@
-//Copyright (C) 2021 Jose Ignacio Ferrer Vera
+//Copyright (C) 2021 Jose Ignacio Ferrer Vera and Ana Carolina Arellano
 'use strict';
 
 export default class Level {
@@ -33,6 +33,7 @@ export default class Level {
     //"payload": "JSONString" // actual data in JSON format 
     //}           
 
+    //append objects with their corresponding  attributes and physic properties 
     _appendObjectToList($objectDetails, x, y){
         let object = {
             id: this.id++,
@@ -56,6 +57,7 @@ export default class Level {
         this.info.level.entityLists.collidableList.push(object);
     }
 
+    //append enemies with their corresponding attributes and physic properties 
     _appendEnemyToList($objectDetails, x, y){
         let object = {
             id: this.id++,
