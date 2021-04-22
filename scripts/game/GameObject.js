@@ -15,6 +15,8 @@ export default class GameObject {
             this.$object = this._createEnemy(element);
         }else if(element.entity.type == 2){
             this.$object = this._createCannonball(element);
+        }else if(element.entity.type == 3){
+            this.$object = this._createRabbit(element);
         }
         this.type = element.entity.type; 
 
@@ -103,6 +105,7 @@ export default class GameObject {
             return $newEl;
     }
 
+    //make enemies
     _createEnemy(element){
         let $newEn = $(`<div 
                             id = "fox-sprite"
@@ -118,6 +121,22 @@ export default class GameObject {
             return $newEn;
     }
 
+    //make rabbits
+    _createRabbit(element){
+        let $newEn = $(`<div 
+                            id = "rabbit-sprite"
+                            style = "position: absolute;
+                                    "
+                            >
+                            </div>`)
+
+            //Adds enemy data to the enemies
+            $newEn = this._addObjectData($newEn, element.entity);
+
+            return $newEn;
+    }
+
+    //make cannon ball
     _createCannonball(element){
         let $newEl = $(`<div 
                             id = "cannonball-${this.id}"
@@ -137,6 +156,7 @@ export default class GameObject {
             return $newEl;
     }
 
+    //create model
     _createModel( box2DPos, box2DSize) {    
         
         let bodyDefn = new Physics.BodyDef();         

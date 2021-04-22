@@ -111,7 +111,6 @@ export default class World {
         listener.PostSolve = (contact, impulse) =>{
             //Called after collision but before physics happen
             //Place your stuff
-            //TODO: WIN/LOSE Flags
             let itemA = contact.GetFixtureA().GetBody().GetUserData();
             let itemB = contact.GetFixtureB().GetBody().GetUserData();
 
@@ -302,6 +301,7 @@ export default class World {
             }
         }
 
+        //destroy antities
         if(destroyedEntity){
             if(removedIndex == this.entityList.length-1){
                 this.entityList.pop();
@@ -327,6 +327,7 @@ export default class World {
             }
         })
 
+        //display won message
         if(!enemyExists){
             $('#ammo').html(`<p>YOU WON!</p>`);
             this.gameOver = true;
